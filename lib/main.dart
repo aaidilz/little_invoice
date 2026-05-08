@@ -1,17 +1,20 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:timezone/data/latest.dart' as tz;
-import 'package:invoice_app/core/services/notification_service.dart';
-import 'package:invoice_app/core/theme/app_theme.dart';
-import 'package:invoice_app/providers/buyer_provider.dart';
-import 'package:invoice_app/providers/invoice_provider.dart';
-import 'package:invoice_app/providers/seller_provider.dart';
-import 'package:invoice_app/screens/home_screen.dart';
+import 'package:little_invoice/core/services/notification_service.dart';
+import 'package:little_invoice/core/theme/app_theme.dart';
+import 'package:little_invoice/providers/buyer_provider.dart';
+import 'package:little_invoice/providers/invoice_provider.dart';
+import 'package:little_invoice/providers/seller_provider.dart';
+import 'package:little_invoice/screens/home_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await NotificationService().initialize();
-  tz.initializeTimeZones();
+  if (!kIsWeb) {
+    await NotificationService().initialize();
+    tz.initializeTimeZones();
+  }
   runApp(
     MultiProvider(
       providers: [

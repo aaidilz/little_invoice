@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:invoice_app/core/theme/app_colors.dart';
-import 'package:invoice_app/core/theme/app_text_styles.dart';
-import 'package:invoice_app/core/theme/app_theme.dart';
-import 'package:invoice_app/core/utils/currency_formatter.dart';
+import 'package:little_invoice/core/theme/app_colors.dart';
+import 'package:little_invoice/core/theme/app_text_styles.dart';
+import 'package:little_invoice/core/theme/app_theme.dart';
+import 'package:little_invoice/core/utils/currency_formatter.dart';
 
 class CalculationSummaryWidget extends StatelessWidget {
   final double subtotal;

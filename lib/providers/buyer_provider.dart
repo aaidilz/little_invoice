@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
-import 'package:invoice_app/core/database/dao/buyer_dao.dart';
-import 'package:invoice_app/models/buyer.dart';
+import 'package:little_invoice/core/database/dao/buyer_dao.dart';
+import 'package:little_invoice/models/buyer.dart';
 
 class BuyerProvider extends ChangeNotifier {
   final BuyerDao _dao = BuyerDao();
@@ -15,6 +15,8 @@ class BuyerProvider extends ChangeNotifier {
   String? get errorMessage => _errorMessage;
 
   Future<void> initialize() async {
+    if (kIsWeb) return; // Skip for web
+    
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();

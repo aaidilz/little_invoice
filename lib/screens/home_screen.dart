@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:invoice_app/core/theme/app_colors.dart';
-import 'package:invoice_app/core/theme/app_text_styles.dart';
-import 'package:invoice_app/core/theme/app_theme.dart';
-import 'package:invoice_app/core/utils/currency_formatter.dart';
-import 'package:invoice_app/models/invoice.dart';
-import 'package:invoice_app/providers/invoice_provider.dart';
-import 'package:invoice_app/screens/invoice_list_screen.dart';
-import 'package:invoice_app/screens/buyer_list_screen.dart';
-import 'package:invoice_app/screens/seller_profile_screen.dart';
-import 'package:invoice_app/screens/invoice_form_screen.dart';
-import 'package:invoice_app/widgets/invoice_card.dart';
-import 'package:invoice_app/widgets/empty_state_widget.dart';
+import 'package:little_invoice/core/theme/app_colors.dart';
+import 'package:little_invoice/core/theme/app_text_styles.dart';
+import 'package:little_invoice/core/theme/app_theme.dart';
+import 'package:little_invoice/core/utils/currency_formatter.dart';
+import 'package:little_invoice/models/invoice.dart';
+import 'package:little_invoice/providers/invoice_provider.dart';
+import 'package:little_invoice/screens/invoice_list_screen.dart';
+import 'package:little_invoice/screens/invoice_form_screen.dart';
+import 'package:little_invoice/screens/buyer_list_screen.dart';
+import 'package:little_invoice/screens/seller_profile_screen.dart';
+import 'package:little_invoice/widgets/invoice_card.dart';
+import 'package:little_invoice/widgets/empty_state_widget.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -73,7 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => const InvoiceFormScreen()),
+                  MaterialPageRoute(builder: (_) => InvoiceFormScreen()),
                 );
               },
               label: const Text('New Invoice'),
@@ -90,7 +90,7 @@ class _HomeTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<InvoiceProvider>(
-      builder: (context, provider, child) {
+      builder: (BuildContext context, InvoiceProvider provider, Widget? child) {
         if (provider.isLoading) {
           return const Center(child: CircularProgressIndicator());
         }
@@ -140,7 +140,7 @@ class _HomeTab extends StatelessWidget {
                 children: [
                   Text(
                     'Recent Invoices',
-                    style: AppTextStyles.headline,
+                    style: AppTextStyles.h1,
                   ),
                   TextButton(
                     onPressed: () {
@@ -153,7 +153,7 @@ class _HomeTab extends StatelessWidget {
                     },
                     child: Text(
                       'See All',
-                      style: AppTextStyles.label.copyWith(
+                      style: AppTextStyles.labelBold.copyWith(
                         color: AppColors.secondary,
                       ),
                     ),
@@ -171,7 +171,7 @@ class _HomeTab extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => const InvoiceFormScreen(),
+                            builder: (_) => InvoiceFormScreen(),
                           ),
                         );
                       },
@@ -225,14 +225,14 @@ class _StatCard extends StatelessWidget {
           children: [
             Text(
               value,
-              style: AppTextStyles.display.copyWith(
+              style: AppTextStyles.statDisplay.copyWith(
                 color: AppColors.primary,
               ),
             ),
             const SizedBox(height: AppTheme.space4),
             Text(
               label,
-              style: AppTextStyles.caption,
+              style: AppTextStyles.bodyMd,
             ),
           ],
         ),
