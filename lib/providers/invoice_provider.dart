@@ -1,10 +1,10 @@
 import 'package:flutter/foundation.dart';
-import 'package:invoice_app/core/database/dao/invoice_dao.dart';
-import 'package:invoice_app/core/database/dao/invoice_item_dao.dart';
-import 'package:invoice_app/core/database/database_helper.dart';
-import 'package:invoice_app/core/services/notification_service.dart';
-import 'package:invoice_app/models/invoice.dart';
-import 'package:invoice_app/models/invoice_item.dart';
+import 'package:little_invoice/core/database/dao/invoice_dao.dart';
+import 'package:little_invoice/core/database/dao/invoice_item_dao.dart';
+import 'package:little_invoice/core/database/database_helper.dart';
+import 'package:little_invoice/core/services/notification_service.dart';
+import 'package:little_invoice/models/invoice.dart';
+import 'package:little_invoice/models/invoice_item.dart';
 
 class InvoiceProvider extends ChangeNotifier {
   final InvoiceDao _invoiceDao = InvoiceDao();
@@ -27,6 +27,8 @@ class InvoiceProvider extends ChangeNotifier {
   String? get errorMessage => _errorMessage;
 
   Future<void> initialize() async {
+    if (kIsWeb) return; // Skip for web
+    
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();

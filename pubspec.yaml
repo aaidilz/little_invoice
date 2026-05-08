@@ -1,4 +1,4 @@
-name: invoice_app
+name: little_invoice
 description: Offline mobile invoice application
 
 publish_to: 'none'

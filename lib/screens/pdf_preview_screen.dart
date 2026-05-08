@@ -1,8 +1,8 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:printing/printing.dart';
-import 'package:invoice_app/core/theme/app_theme.dart';
-import 'package:invoice_app/core/services/file_service.dart';
+import 'package:little_invoice/core/theme/app_theme.dart';
+import 'package:little_invoice/core/services/file_service.dart';
 
 class PdfPreviewScreen extends StatelessWidget {
   final Uint8List pdfBytes;

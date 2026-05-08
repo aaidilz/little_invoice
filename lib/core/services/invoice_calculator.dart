@@ -1,4 +1,4 @@
-import 'package:invoice_app/models/invoice_item.dart';
+import 'package:little_invoice/models/invoice_item.dart';
 
 class InvoiceCalculator {
   double calculateSubtotal(List<InvoiceItem> items) {

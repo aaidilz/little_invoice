@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:invoice_app/core/theme/app_colors.dart';
-import 'package:invoice_app/core/theme/app_text_styles.dart';
-import 'package:invoice_app/core/theme/app_theme.dart';
-import 'package:invoice_app/core/utils/currency_formatter.dart';
-import 'package:invoice_app/core/utils/date_formatter.dart';
-import 'package:invoice_app/models/invoice.dart';
-import 'package:invoice_app/providers/invoice_provider.dart';
-import 'package:invoice_app/providers/seller_provider.dart';
-import 'package:invoice_app/providers/buyer_provider.dart';
-import 'package:invoice_app/widgets/status_badge_widget.dart';
-import 'package:invoice_app/widgets/calculation_summary_widget.dart';
-import 'package:invoice_app/features/pdf/pdf_generator.dart';
-import 'package:invoice_app/core/services/file_service.dart';
-import 'package:invoice_app/screens/pdf_preview_screen.dart';
-import 'package:invoice_app/screens/invoice_form_screen.dart';
+import 'package:little_invoice/core/theme/app_colors.dart';
+import 'package:little_invoice/core/theme/app_text_styles.dart';
+import 'package:little_invoice/core/theme/app_theme.dart';
+import 'package:little_invoice/core/utils/currency_formatter.dart';
+import 'package:little_invoice/core/utils/date_formatter.dart';
+import 'package:little_invoice/models/invoice.dart';
+import 'package:little_invoice/providers/invoice_provider.dart';
+import 'package:little_invoice/providers/seller_provider.dart';
+import 'package:little_invoice/providers/buyer_provider.dart';
+import 'package:little_invoice/widgets/status_badge_widget.dart';
+import 'package:little_invoice/widgets/calculation_summary_widget.dart';
+import 'package:little_invoice/features/pdf/pdf_generator.dart';
+import 'package:little_invoice/core/services/file_service.dart';
+import 'package:little_invoice/screens/pdf_preview_screen.dart';
+import 'package:little_invoice/screens/invoice_form_screen.dart';
 
 class InvoiceDetailScreen extends StatefulWidget {
   final int invoiceId;

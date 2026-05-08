@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:invoice_app/core/services/invoice_calculator.dart';
-import 'package:invoice_app/models/invoice_item.dart';
+import 'package:little_invoice/core/services/invoice_calculator.dart';
+import 'package:little_invoice/models/invoice_item.dart';
 
 void main() {
   late InvoiceCalculator calculator;

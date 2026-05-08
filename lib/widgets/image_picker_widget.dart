@@ -1,10 +1,10 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:invoice_app/core/services/file_service.dart';
-import 'package:invoice_app/core/theme/app_colors.dart';
-import 'package:invoice_app/core/theme/app_text_styles.dart';
-import 'package:invoice_app/core/theme/app_theme.dart';
+import 'package:little_invoice/core/services/file_service.dart';
+import 'package:little_invoice/core/theme/app_colors.dart';
+import 'package:little_invoice/core/theme/app_text_styles.dart';
+import 'package:little_invoice/core/theme/app_theme.dart';
 
 class ImagePickerWidget extends StatelessWidget {
   final String label;

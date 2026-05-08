@@ -1,9 +1,9 @@
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:invoice_app/models/buyer.dart';
-import 'package:invoice_app/models/invoice.dart';
-import 'package:invoice_app/models/invoice_item.dart';
-import 'package:invoice_app/models/seller_profile.dart';
+import 'package:little_invoice/models/buyer.dart';
+import 'package:little_invoice/models/invoice.dart';
+import 'package:little_invoice/models/invoice_item.dart';
+import 'package:little_invoice/models/seller_profile.dart';
 import 'package:intl/intl.dart';
 
 class TemplateClassic {

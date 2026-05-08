@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:invoice_app/models/buyer.dart';
-import 'package:invoice_app/models/invoice.dart';
-import 'package:invoice_app/models/invoice_item.dart';
-import 'package:invoice_app/models/seller_profile.dart';
+import 'package:little_invoice/models/buyer.dart';
+import 'package:little_invoice/models/invoice.dart';
+import 'package:little_invoice/models/invoice_item.dart';
+import 'package:little_invoice/models/seller_profile.dart';
 
 void main() {
   group('Models Serialization', () {

@@ -2,41 +2,97 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 abstract class AppTextStyles {
-  static TextStyle get display => GoogleFonts.nunitoSans(
+  // Existing styles
+  // Existing styles
+  // Existing styles
+  // Existing styles
+  // Existing styles
+  // Existing styles
+  // Existing styles
+  // Existing styles
+  // Existing styles
+  // Existing styles
+  // Existing styles
+  // Existing styles
+  // Existing styles
+  // Existing styles
+  // Existing styles
+  // Existing styles
+  // Existing styles
+  // Existing styles
+  // Existing styles
+  static TextStyle get h1 => GoogleFonts.manrope(
     fontSize: 24,
-    fontWeight: FontWeight.w600,
-    height: 1.3,
+    fontWeight: FontWeight.w700,
+    height: 32/24,
   );
 
-  static TextStyle get headline => GoogleFonts.nunitoSans(
+  static TextStyle get h2 => GoogleFonts.manrope(
     fontSize: 20,
     fontWeight: FontWeight.w600,
-    height: 1.35,
+    height: 28/20,
   );
 
-  static TextStyle get title => GoogleFonts.nunitoSans(
+  static TextStyle get bodyLg => GoogleFonts.inter(
     fontSize: 16,
-    fontWeight: FontWeight.w500,
-    height: 1.4,
+    fontWeight: FontWeight.w400,
+    height: 24/16,
   );
 
-  static TextStyle get body => GoogleFonts.nunitoSans(
+  static TextStyle get bodyMd => GoogleFonts.inter(
     fontSize: 14,
     fontWeight: FontWeight.w400,
-    height: 1.5,
+    height: 20/14,
   );
 
-  static TextStyle get label => GoogleFonts.nunitoSans(
+  static TextStyle get labelBold => GoogleFonts.inter(
     fontSize: 12,
-    fontWeight: FontWeight.w500,
-    height: 1.4,
+    fontWeight: FontWeight.w600,
+    height: 16/12,
     letterSpacing: 0.5,
   );
 
-  static TextStyle get caption => GoogleFonts.nunitoSans(
-    fontSize: 11,
+  static TextStyle get statDisplay => GoogleFonts.manrope(
+    fontSize: 28,
+    fontWeight: FontWeight.w700,
+    height: 34/28,
+  );
+
+  // Additional styles needed by the app
+  static TextStyle get title => GoogleFonts.inter(
+    fontSize: 16,
+    fontWeight: FontWeight.w500,
+    height: 24/16,
+  );
+
+  static TextStyle get body => GoogleFonts.inter(
+    fontSize: 14,
     fontWeight: FontWeight.w400,
-    height: 1.4,
-    color: const Color(0xFF6E7D8A),
+    height: 20/14,
+  );
+
+  static TextStyle get label => GoogleFonts.inter(
+    fontSize: 12,
+    fontWeight: FontWeight.w500,
+    height: 16/12,
+    letterSpacing: 0.5,
+  );
+
+  static TextStyle get headline => GoogleFonts.manrope(
+    fontSize: 18,
+    fontWeight: FontWeight.w600,
+    height: 26/18,
+  );
+
+  static TextStyle get caption => GoogleFonts.inter(
+    fontSize: 12,
+    fontWeight: FontWeight.w400,
+    height: 16/12,
+  );
+
+  static TextStyle get display => GoogleFonts.manrope(
+    fontSize: 32,
+    fontWeight: FontWeight.w700,
+    height: 40/32,
   );
 }

@@ -2,13 +2,13 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:invoice_app/core/services/file_service.dart';
-import 'package:invoice_app/models/buyer.dart';
-import 'package:invoice_app/models/invoice.dart';
-import 'package:invoice_app/models/invoice_item.dart';
-import 'package:invoice_app/models/seller_profile.dart';
-import 'package:invoice_app/features/pdf/template_classic.dart';
-import 'package:invoice_app/features/pdf/template_modern.dart';
+import 'package:little_invoice/core/services/file_service.dart';
+import 'package:little_invoice/models/buyer.dart';
+import 'package:little_invoice/models/invoice.dart';
+import 'package:little_invoice/models/invoice_item.dart';
+import 'package:little_invoice/models/seller_profile.dart';
+import 'package:little_invoice/features/pdf/template_classic.dart';
+import 'package:little_invoice/features/pdf/template_modern.dart';
 
 class PdfGenerator {
   final FileService fileService;
