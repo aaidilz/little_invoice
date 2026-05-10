@@ -28,9 +28,7 @@ class InvoiceProvider extends ChangeNotifier {
 
   Future<void> initialize() async {
     if (kIsWeb) return; // Skip for web
-    
-    await Future.microtask(() {});
-    
+
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
@@ -50,27 +48,38 @@ class InvoiceProvider extends ChangeNotifier {
     _errorMessage = null;
     notifyListeners();
 
-    final db = await DatabaseHelper.instance.database;
     try {
-      final id = await db.transaction((txn) async {
-        final id = await txn.insert('invoices', invoice.toMap());
-        for (var item in items) {
-          final itemWithInvoiceId = item.copyWith(invoiceId: id);
-          await txn.insert('invoice_items', itemWithInvoiceId.toMap());
+      if (kIsWeb) {
+        final nextId = (_invoices
+                .map((i) => i.id ?? 0)
+                .fold<int>(0, (maxId, id) => id > maxId ? id : maxId)) +
+            1;
+        final createdInvoice = invoice.copyWith(id: nextId);
+        _invoices.insert(0, createdInvoice);
+      } else {
+        final db = await DatabaseHelper.instance.database;
+        final id = await db.transaction((txn) async {
+          final id = await txn.insert('invoices', invoice.toMap());
+          for (var item in items) {
+            final itemWithInvoiceId = item.copyWith(invoiceId: id);
+            await txn.insert('invoice_items', itemWithInvoiceId.toMap());
+          }
+          return id;
+        });
+
+        final createdInvoice = invoice.copyWith(id: id);
+        _invoices.insert(0, createdInvoice);
+
+        if (createdInvoice.status == InvoiceStatus.unpaid) {
+          // Schedule reminder outside transaction
+          _notificationService
+              .scheduleReminder(
+                invoiceId: id,
+                invoiceNumber: createdInvoice.invoiceNumber,
+                dueDate: createdInvoice.dueDate,
+              )
+              .catchError((e) => debugPrint('Failed to schedule reminder: $e'));
         }
-        return id;
-      });
-      
-      final createdInvoice = invoice.copyWith(id: id);
-      _invoices.insert(0, createdInvoice);
-      
-      if (createdInvoice.status == InvoiceStatus.unpaid) {
-        // Schedule reminder outside transaction
-        _notificationService.scheduleReminder(
-          invoiceId: id,
-          invoiceNumber: createdInvoice.invoiceNumber,
-          dueDate: createdInvoice.dueDate,
-        ).catchError((e) => debugPrint('Failed to schedule reminder: $e'));
       }
     } catch (e) {
       _errorMessage = e.toString();
@@ -85,27 +94,23 @@ class InvoiceProvider extends ChangeNotifier {
     _errorMessage = null;
     notifyListeners();
 
-    final db = await DatabaseHelper.instance.database;
     try {
-      await db.transaction((txn) async {
-        await txn.update(
-          'invoices', 
-          invoice.toMap(),
-          where: 'id = ?',
-          whereArgs: [invoice.id]
-        );
-        
-        await txn.delete(
-          'invoice_items',
-          where: 'invoice_id = ?',
-          whereArgs: [invoice.id]
-        );
+      if (!kIsWeb) {
+        final db = await DatabaseHelper.instance.database;
+        await db.transaction((txn) async {
+          await txn.update('invoices', invoice.toMap(),
+              where: 'id = ?', whereArgs: [invoice.id]);
 
-        for (var item in items) {
-          final itemWithInvoiceId = item.copyWith(invoiceId: invoice.id, id: null);
-          await txn.insert('invoice_items', itemWithInvoiceId.toMap());
-        }
-      });
+          await txn.delete('invoice_items',
+              where: 'invoice_id = ?', whereArgs: [invoice.id]);
+
+          for (var item in items) {
+            final itemWithInvoiceId =
+                item.copyWith(invoiceId: invoice.id, id: null);
+            await txn.insert('invoice_items', itemWithInvoiceId.toMap());
+          }
+        });
+      }
 
       final index = _invoices.indexWhere((inv) => inv.id == invoice.id);
       if (index != -1) {
@@ -113,13 +118,16 @@ class InvoiceProvider extends ChangeNotifier {
       }
 
       if (invoice.status == InvoiceStatus.unpaid) {
-        _notificationService.scheduleReminder(
-          invoiceId: invoice.id!,
-          invoiceNumber: invoice.invoiceNumber,
-          dueDate: invoice.dueDate,
-        ).catchError((e) => debugPrint('Failed to schedule reminder: $e'));
+        _notificationService
+            .scheduleReminder(
+              invoiceId: invoice.id!,
+              invoiceNumber: invoice.invoiceNumber,
+              dueDate: invoice.dueDate,
+            )
+            .catchError((e) => debugPrint('Failed to schedule reminder: $e'));
       } else {
-        _notificationService.cancelReminder(invoice.id!)
+        _notificationService
+            .cancelReminder(invoice.id!)
             .catchError((e) => debugPrint('Failed to cancel reminder: $e'));
       }
     } catch (e) {
@@ -142,23 +150,27 @@ class InvoiceProvider extends ChangeNotifier {
         final newStatus = invoice.status == InvoiceStatus.paid
             ? InvoiceStatus.unpaid
             : InvoiceStatus.paid;
-        
-        final updatedInvoice = invoice.copyWith(status: newStatus);
-        await _invoiceDao.update(updatedInvoice);
-        _invoices[index] = updatedInvoice;
+
+        if (!kIsWeb) {
+          final updatedInvoice = invoice.copyWith(status: newStatus);
+          await _invoiceDao.update(updatedInvoice);
+          _invoices[index] = updatedInvoice;
+        } else {
+          _invoices[index] = invoice.copyWith(status: newStatus);
+        }
 
         if (newStatus == InvoiceStatus.paid) {
           await _notificationService.cancelReminder(invoiceId);
         } else {
           await _notificationService.scheduleReminder(
-            invoiceId: updatedInvoice.id!,
-            invoiceNumber: updatedInvoice.invoiceNumber,
-            dueDate: updatedInvoice.dueDate,
+            invoiceId: invoiceId,
+            invoiceNumber: _invoices[index].invoiceNumber,
+            dueDate: _invoices[index].dueDate,
           );
         }
-        
+
         if (_selectedInvoice?.id == invoiceId) {
-          _selectedInvoice = updatedInvoice;
+          _selectedInvoice = _invoices[index];
         }
       }
     } catch (e) {
@@ -175,7 +187,9 @@ class InvoiceProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await _invoiceDao.delete(id);
+      if (!kIsWeb) {
+        await _invoiceDao.delete(id);
+      }
       _invoices.removeWhere((inv) => inv.id == id);
       await _notificationService.cancelReminder(id);
     } catch (e) {
@@ -190,6 +204,11 @@ class InvoiceProvider extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
     try {
+      if (kIsWeb) {
+        return _currentItems
+            .where((item) => item.invoiceId == invoiceId)
+            .toList();
+      }
       _currentItems = await _itemDao.getByInvoice(invoiceId);
       return _currentItems;
     } catch (e) {

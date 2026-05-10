@@ -16,9 +16,7 @@ class BuyerProvider extends ChangeNotifier {
 
   Future<void> initialize() async {
     if (kIsWeb) return; // Skip for web
-    
-    await Future.microtask(() {});
-    
+
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
@@ -39,8 +37,16 @@ class BuyerProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final id = await _dao.insert(buyer);
-      _buyers.add(buyer.copyWith(id: id));
+      if (kIsWeb) {
+        final nextId = (_buyers
+                .map((b) => b.id ?? 0)
+                .fold<int>(0, (maxId, id) => id > maxId ? id : maxId)) +
+            1;
+        _buyers.add(buyer.copyWith(id: nextId));
+      } else {
+        final id = await _dao.insert(buyer);
+        _buyers.add(buyer.copyWith(id: id));
+      }
     } catch (e) {
       _errorMessage = e.toString();
     } finally {
@@ -55,7 +61,9 @@ class BuyerProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await _dao.update(buyer);
+      if (!kIsWeb) {
+        await _dao.update(buyer);
+      }
       final index = _buyers.indexWhere((b) => b.id == buyer.id);
       if (index != -1) {
         _buyers[index] = buyer;
@@ -74,7 +82,9 @@ class BuyerProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await _dao.delete(id);
+      if (!kIsWeb) {
+        await _dao.delete(id);
+      }
       _buyers.removeWhere((b) => b.id == id);
     } catch (e) {
       _errorMessage = e.toString();

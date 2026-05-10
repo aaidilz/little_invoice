@@ -34,8 +34,10 @@ class PdfGenerator {
     }
 
     pw.MemoryImage? signatureImage;
-    if (seller.signaturePath != null && await File(seller.signaturePath!).exists()) {
-      signatureImage = pw.MemoryImage(await File(seller.signaturePath!).readAsBytes());
+    if (seller.signaturePath != null &&
+        await File(seller.signaturePath!).exists()) {
+      signatureImage =
+          pw.MemoryImage(await File(seller.signaturePath!).readAsBytes());
     }
 
     if (templateIndex == 0) {

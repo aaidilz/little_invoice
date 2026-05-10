@@ -37,7 +37,9 @@ class TemplateClassic {
           _buildCalculationSummary(invoice),
           if (invoice.notes != null && invoice.notes!.isNotEmpty) ...[
             pw.SizedBox(height: 20),
-            pw.Text('Notes:', style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10)),
+            pw.Text('Notes:',
+                style:
+                    pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10)),
             pw.Text(invoice.notes!, style: const pw.TextStyle(fontSize: 10)),
           ],
           pw.SizedBox(height: 40),
@@ -47,10 +49,12 @@ class TemplateClassic {
     );
   }
 
-  static pw.Widget _buildHeader(SellerProfile seller, pw.MemoryImage? logoImage) {
+  static pw.Widget _buildHeader(
+      SellerProfile seller, pw.MemoryImage? logoImage) {
     return pw.Container(
       padding: const pw.EdgeInsets.all(10),
-      decoration: pw.BoxDecoration(border: pw.Border.all(color: PdfColors.black)),
+      decoration:
+          pw.BoxDecoration(border: pw.Border.all(color: PdfColors.black)),
       child: pw.Row(
         mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
         children: [
@@ -58,11 +62,17 @@ class TemplateClassic {
             child: pw.Column(
               crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
-                pw.Text(seller.name, style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold)),
-                pw.Text(seller.address, style: const pw.TextStyle(fontSize: 10)),
-                pw.Text('Phone: ${seller.phone}', style: const pw.TextStyle(fontSize: 10)),
-                pw.Text('Email: ${seller.email}', style: const pw.TextStyle(fontSize: 10)),
-                pw.Text('Bank: ${seller.bank}', style: const pw.TextStyle(fontSize: 10)),
+                pw.Text(seller.name,
+                    style: pw.TextStyle(
+                        fontSize: 14, fontWeight: pw.FontWeight.bold)),
+                pw.Text(seller.address,
+                    style: const pw.TextStyle(fontSize: 10)),
+                pw.Text('Phone: ${seller.phone}',
+                    style: const pw.TextStyle(fontSize: 10)),
+                pw.Text('Email: ${seller.email}',
+                    style: const pw.TextStyle(fontSize: 10)),
+                pw.Text('Bank: ${seller.bank}',
+                    style: const pw.TextStyle(fontSize: 10)),
               ],
             ),
           ),
@@ -77,13 +87,18 @@ class TemplateClassic {
     return pw.Row(
       mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
       children: [
-        pw.Text('INVOICE', style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold)),
+        pw.Text('INVOICE',
+            style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold)),
         pw.Column(
           crossAxisAlignment: pw.CrossAxisAlignment.end,
           children: [
-            pw.Text('No: ${invoice.invoiceNumber}', style: pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold)),
-            pw.Text('Date: ${invoice.cityDate}', style: const pw.TextStyle(fontSize: 10)),
-            pw.Text('Due Date: ${dateFormat.format(invoice.dueDate)}', style: const pw.TextStyle(fontSize: 10)),
+            pw.Text('No: ${invoice.invoiceNumber}',
+                style:
+                    pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold)),
+            pw.Text('Date: ${invoice.cityDate}',
+                style: const pw.TextStyle(fontSize: 10)),
+            pw.Text('Due Date: ${dateFormat.format(invoice.dueDate)}',
+                style: const pw.TextStyle(fontSize: 10)),
           ],
         ),
       ],
@@ -94,11 +109,15 @@ class TemplateClassic {
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
-        pw.Text('Bill To:', style: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold)),
-        pw.Text(buyer.name, style: pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold)),
+        pw.Text('Bill To:',
+            style: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold)),
+        pw.Text(buyer.name,
+            style: pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold)),
         pw.Text(buyer.address, style: const pw.TextStyle(fontSize: 10)),
-        pw.Text('Phone: ${buyer.phone}', style: const pw.TextStyle(fontSize: 10)),
-        pw.Text('Email: ${buyer.email}', style: const pw.TextStyle(fontSize: 10)),
+        pw.Text('Phone: ${buyer.phone}',
+            style: const pw.TextStyle(fontSize: 10)),
+        pw.Text('Email: ${buyer.email}',
+            style: const pw.TextStyle(fontSize: 10)),
       ],
     );
   }
@@ -143,11 +162,16 @@ class TemplateClassic {
             crossAxisAlignment: pw.CrossAxisAlignment.stretch,
             children: [
               _buildSummaryRow('Subtotal', invoice.subtotal.toStringAsFixed(2)),
-              _buildSummaryRow('Discount (${invoice.discount.toStringAsFixed(1)}%)', '– ${ (invoice.subtotal * invoice.discount / 100).toStringAsFixed(2) }'),
-              _buildSummaryRow('Tax (${invoice.tax.toStringAsFixed(1)}%)', '+ ${ ((invoice.subtotal - (invoice.subtotal * invoice.discount / 100)) * invoice.tax / 100).toStringAsFixed(2) }'),
-              _buildSummaryRow('Down Payment', '– ${invoice.dp.toStringAsFixed(2)}'),
+              _buildSummaryRow(
+                  'Discount (${invoice.discount.toStringAsFixed(1)}%)',
+                  '– ${(invoice.subtotal * invoice.discount / 100).toStringAsFixed(2)}'),
+              _buildSummaryRow('Tax (${invoice.tax.toStringAsFixed(1)}%)',
+                  '+ ${((invoice.subtotal - (invoice.subtotal * invoice.discount / 100)) * invoice.tax / 100).toStringAsFixed(2)}'),
+              _buildSummaryRow(
+                  'Down Payment', '– ${invoice.dp.toStringAsFixed(2)}'),
               pw.Divider(),
-              _buildSummaryRow('Total', invoice.total.toStringAsFixed(2), isBold: true),
+              _buildSummaryRow('Total', invoice.total.toStringAsFixed(2),
+                  isBold: true),
             ],
           ),
         ),
@@ -155,20 +179,28 @@ class TemplateClassic {
     );
   }
 
-  static pw.Widget _buildSummaryRow(String label, String value, {bool isBold = false}) {
+  static pw.Widget _buildSummaryRow(String label, String value,
+      {bool isBold = false}) {
     return pw.Padding(
       padding: const pw.EdgeInsets.symmetric(vertical: 2),
       child: pw.Row(
         mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
         children: [
-          pw.Text(label, style: pw.TextStyle(fontSize: 10, fontWeight: isBold ? pw.FontWeight.bold : null)),
-          pw.Text(value, style: pw.TextStyle(fontSize: 10, fontWeight: isBold ? pw.FontWeight.bold : null)),
+          pw.Text(label,
+              style: pw.TextStyle(
+                  fontSize: 10,
+                  fontWeight: isBold ? pw.FontWeight.bold : null)),
+          pw.Text(value,
+              style: pw.TextStyle(
+                  fontSize: 10,
+                  fontWeight: isBold ? pw.FontWeight.bold : null)),
         ],
       ),
     );
   }
 
-  static pw.Widget _buildSignatureBlock(SellerProfile seller, Invoice invoice, pw.MemoryImage? stampImage, pw.MemoryImage? signatureImage) {
+  static pw.Widget _buildSignatureBlock(SellerProfile seller, Invoice invoice,
+      pw.MemoryImage? stampImage, pw.MemoryImage? signatureImage) {
     return pw.Row(
       mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
       crossAxisAlignment: pw.CrossAxisAlignment.end,
@@ -178,7 +210,7 @@ class TemplateClassic {
           pw.Image(stampImage, width: 80, height: 80)
         else
           pw.SizedBox(width: 80, height: 80),
-        
+
         // Signature on the right
         pw.Column(
           crossAxisAlignment: pw.CrossAxisAlignment.center,
@@ -192,7 +224,8 @@ class TemplateClassic {
             pw.SizedBox(height: 8),
             pw.Text(
               seller.name,
-              style: const pw.TextStyle(fontSize: 10, decoration: pw.TextDecoration.underline),
+              style: const pw.TextStyle(
+                  fontSize: 10, decoration: pw.TextDecoration.underline),
             ),
           ],
         ),

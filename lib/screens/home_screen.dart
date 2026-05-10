@@ -42,17 +42,18 @@ class _HomeScreenState extends State<HomeScreen> {
               height: 32,
               decoration: const BoxDecoration(
                 color: AppColors.primaryContainer,
-                shape: BoxShape.circle,
+                shape: BoxShape.rectangle,
               ),
-              child: const Icon(
-                Icons.business_center,
-                size: 18,
-                color: AppColors.onPrimaryContainer,
+              child: Image.asset(
+                'images/Icon.png',
+                width: 20,
+                height: 20,
+                fit: BoxFit.contain,
               ),
             ),
             const SizedBox(width: AppTheme.space12),
             Text(
-              'Invoicely',
+              'Little Invoice',
               style: AppTextStyles.h1.copyWith(color: AppColors.primary),
             ),
           ],
@@ -128,9 +129,7 @@ class _HomeScreenState extends State<HomeScreen> {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: isSelected
-              ? AppColors.primaryContainer
-              : Colors.transparent,
+          color: isSelected ? AppColors.primaryContainer : Colors.transparent,
           borderRadius: BorderRadius.circular(AppTheme.radiusCard),
         ),
         child: Column(
@@ -293,7 +292,7 @@ class _HomeTab extends StatelessWidget {
                         icon: Icons.receipt_long_outlined,
                         headline: 'No invoices yet',
                         body:
-                            'Create your first invoice to get started with Invoicely',
+                            'Create your first invoice to get started with Little Invoice',
                         ctaLabel: 'Create Invoice',
                         onCta: () {
                           Navigator.push(

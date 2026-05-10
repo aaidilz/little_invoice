@@ -16,9 +16,7 @@ class SellerProvider extends ChangeNotifier {
 
   Future<void> initialize() async {
     if (kIsWeb) return; // Skip for web
-    
-    await Future.microtask(() {});
-    
+
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
@@ -39,12 +37,17 @@ class SellerProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      if (profile.id == null) {
-        final id = await _dao.insert(profile);
+      if (kIsWeb) {
+        final id = profile.id ?? _profile?.id ?? 1;
         _profile = profile.copyWith(id: id);
       } else {
-        await _dao.update(profile);
-        _profile = profile;
+        if (profile.id == null) {
+          final id = await _dao.insert(profile);
+          _profile = profile.copyWith(id: id);
+        } else {
+          await _dao.update(profile);
+          _profile = profile;
+        }
       }
     } catch (e) {
       _errorMessage = e.toString();

@@ -175,7 +175,7 @@ class _FilterTab extends StatelessWidget {
             boxShadow: isSelected
                 ? [
                     const BoxShadow(
-                      color: AppColors.customShadow,
+                      color: AppColors.cardShadow,
                       blurRadius: 4,
                       offset: Offset(0, 1),
                     ),
