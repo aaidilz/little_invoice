@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:invoice_app/core/theme/app_theme.dart';
-import 'package:invoice_app/models/buyer.dart';
-import 'package:invoice_app/providers/buyer_provider.dart';
+import 'package:little_invoice/core/theme/app_theme.dart';
+import 'package:little_invoice/models/buyer.dart';
+import 'package:little_invoice/providers/buyer_provider.dart';
 
 class BuyerFormScreen extends StatefulWidget {
   final Buyer? buyer;

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:invoice_app/core/theme/app_colors.dart';
-import 'package:invoice_app/core/theme/app_text_styles.dart';
-import 'package:invoice_app/core/theme/app_theme.dart';
-import 'package:invoice_app/providers/buyer_provider.dart';
-import 'package:invoice_app/screens/buyer_form_screen.dart';
-import 'package:invoice_app/widgets/empty_state_widget.dart';
+import 'package:little_invoice/core/theme/app_colors.dart';
+import 'package:little_invoice/core/theme/app_text_styles.dart';
+import 'package:little_invoice/core/theme/app_theme.dart';
+import 'package:little_invoice/providers/buyer_provider.dart';
+import 'package:little_invoice/screens/buyer_form_screen.dart';
+import 'package:little_invoice/widgets/empty_state_widget.dart';
 
 class BuyerListScreen extends StatelessWidget {
   const BuyerListScreen({super.key});

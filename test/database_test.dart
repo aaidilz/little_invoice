@@ -1,12 +1,12 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:invoice_app/core/database/dao/buyer_dao.dart';
-import 'package:invoice_app/core/database/dao/invoice_dao.dart';
-import 'package:invoice_app/core/database/dao/invoice_item_dao.dart';
-import 'package:invoice_app/core/database/dao/seller_dao.dart';
-import 'package:invoice_app/models/buyer.dart';
-import 'package:invoice_app/models/invoice.dart';
-import 'package:invoice_app/models/invoice_item.dart';
-import 'package:invoice_app/models/seller_profile.dart';
+import 'package:little_invoice/core/database/dao/buyer_dao.dart';
+import 'package:little_invoice/core/database/dao/invoice_dao.dart';
+import 'package:little_invoice/core/database/dao/invoice_item_dao.dart';
+import 'package:little_invoice/core/database/dao/seller_dao.dart';
+import 'package:little_invoice/models/buyer.dart';
+import 'package:little_invoice/models/invoice.dart';
+import 'package:little_invoice/models/invoice_item.dart';
+import 'package:little_invoice/models/seller_profile.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:sqflite/sqflite.dart';
 

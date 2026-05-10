@@ -1,0 +1,8 @@
+{
+  "remote": "https://api.mcp-stitch.com/v1",
+  "headers": {
+    "Authorization": "Bearer YOUR_API_KEY_HERE",
+    "Content-Type": "application/json"
+  }
+}</content>
+<parameter name="filePath">c:\Users\Lenov\Documents\Kuliah Unpas\semester6\SAB\little_invoice\kilo.json

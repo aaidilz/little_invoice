@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:invoice_app/core/theme/app_theme.dart';
-import 'package:invoice_app/models/seller_profile.dart';
-import 'package:invoice_app/providers/seller_provider.dart';
-import 'package:invoice_app/widgets/image_picker_widget.dart';
+import 'package:little_invoice/core/theme/app_theme.dart';
+import 'package:little_invoice/models/seller_profile.dart';
+import 'package:little_invoice/providers/seller_provider.dart';
+import 'package:little_invoice/widgets/image_picker_widget.dart';
 
 class SellerProfileScreen extends StatefulWidget {
   const SellerProfileScreen({super.key});

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:invoice_app/core/theme/app_colors.dart';
-import 'package:invoice_app/core/theme/app_text_styles.dart';
-import 'package:invoice_app/core/theme/app_theme.dart';
-import 'package:invoice_app/core/utils/currency_formatter.dart';
-import 'package:invoice_app/core/utils/date_formatter.dart';
-import 'package:invoice_app/models/invoice.dart';
+import 'package:little_invoice/core/theme/app_colors.dart';
+import 'package:little_invoice/core/theme/app_text_styles.dart';
+import 'package:little_invoice/core/theme/app_theme.dart';
+import 'package:little_invoice/core/utils/currency_formatter.dart';
+import 'package:little_invoice/core/utils/date_formatter.dart';
+import 'package:little_invoice/models/invoice.dart';
 
 class InvoiceCard extends StatelessWidget {
   final Invoice invoice;

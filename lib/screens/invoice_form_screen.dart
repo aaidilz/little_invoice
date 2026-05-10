@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:invoice_app/core/theme/app_text_styles.dart';
-import 'package:invoice_app/core/theme/app_theme.dart';
-import 'package:invoice_app/models/buyer.dart';
-import 'package:invoice_app/models/invoice.dart';
-import 'package:invoice_app/models/invoice_item.dart';
-import 'package:invoice_app/providers/buyer_provider.dart';
-import 'package:invoice_app/providers/invoice_provider.dart';
-import 'package:invoice_app/providers/seller_provider.dart';
-import 'package:invoice_app/widgets/calculation_summary_widget.dart';
-import 'package:invoice_app/widgets/invoice_item_row.dart';
-import 'package:invoice_app/core/services/invoice_calculator.dart';
-import 'package:invoice_app/core/utils/constants.dart';
+import 'package:little_invoice/core/theme/app_text_styles.dart';
+import 'package:little_invoice/core/theme/app_theme.dart';
+import 'package:little_invoice/models/buyer.dart';
+import 'package:little_invoice/models/invoice.dart';
+import 'package:little_invoice/models/invoice_item.dart';
+import 'package:little_invoice/providers/buyer_provider.dart';
+import 'package:little_invoice/providers/invoice_provider.dart';
+import 'package:little_invoice/providers/seller_provider.dart';
+import 'package:little_invoice/widgets/calculation_summary_widget.dart';
+import 'package:little_invoice/widgets/invoice_item_row.dart';
+import 'package:little_invoice/core/services/invoice_calculator.dart';
+import 'package:little_invoice/core/utils/constants.dart';
 import 'package:intl/intl.dart';
 
 class InvoiceFormScreen extends StatefulWidget {

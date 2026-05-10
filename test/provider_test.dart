@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:invoice_app/models/buyer.dart';
-import 'package:invoice_app/models/seller_profile.dart';
-import 'package:invoice_app/providers/buyer_provider.dart';
-import 'package:invoice_app/providers/seller_provider.dart';
+import 'package:little_invoice/models/buyer.dart';
+import 'package:little_invoice/models/seller_profile.dart';
+import 'package:little_invoice/providers/buyer_provider.dart';
+import 'package:little_invoice/providers/seller_provider.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:sqflite/sqflite.dart';
 
