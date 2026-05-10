@@ -3,6 +3,8 @@ import 'package:little_invoice/core/theme/app_colors.dart';
 import 'package:little_invoice/core/theme/app_text_styles.dart';
 import 'package:little_invoice/core/theme/app_theme.dart';
 
+/// Polished empty state matching the DESIGN pattern:
+/// centered icon in a tinted circle, headline, body, and optional CTA.
 class EmptyStateWidget extends StatelessWidget {
   final IconData icon;
   final String headline;
@@ -23,26 +25,35 @@ class EmptyStateWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 260),
+        constraints: const BoxConstraints(maxWidth: 300),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              icon,
-              size: 40,
-              color: AppColors.onSurface.withOpacity(0.4),
+            // Circular icon container matching DESIGN empty state
+            Container(
+              width: 96,
+              height: 96,
+              decoration: const BoxDecoration(
+                color: AppColors.surfaceContainer,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                icon,
+                size: 48,
+                color: AppColors.outline,
+              ),
             ),
-            const SizedBox(height: AppTheme.space16),
+            const SizedBox(height: AppTheme.space24),
             Text(
               headline,
-              style: AppTextStyles.headline,
+              style: AppTextStyles.h2.copyWith(color: AppColors.primary),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: AppTheme.space8),
             Text(
               body,
-              style: AppTextStyles.body.copyWith(
-                color: AppColors.onSurface.withOpacity(0.6),
+              style: AppTextStyles.bodyMd.copyWith(
+                color: AppColors.onSurfaceVariant,
               ),
               textAlign: TextAlign.center,
             ),
@@ -50,7 +61,7 @@ class EmptyStateWidget extends StatelessWidget {
               const SizedBox(height: AppTheme.space24),
               SizedBox(
                 width: double.infinity,
-                child: OutlinedButton(
+                child: ElevatedButton(
                   onPressed: onCta,
                   child: Text(ctaLabel!),
                 ),

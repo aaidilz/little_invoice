@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:little_invoice/core/theme/app_colors.dart';
+import 'package:little_invoice/core/theme/app_text_styles.dart';
 import 'package:little_invoice/core/theme/app_theme.dart';
 import 'package:little_invoice/models/buyer.dart';
 import 'package:little_invoice/providers/buyer_provider.dart';
@@ -27,7 +29,8 @@ class _BuyerFormScreenState extends State<BuyerFormScreen> {
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.buyer?.name ?? '');
-    _addressController = TextEditingController(text: widget.buyer?.address ?? '');
+    _addressController =
+        TextEditingController(text: widget.buyer?.address ?? '');
     _phoneController = TextEditingController(text: widget.buyer?.phone ?? '');
     _emailController = TextEditingController(text: widget.buyer?.email ?? '');
   }
@@ -64,9 +67,11 @@ class _BuyerFormScreenState extends State<BuyerFormScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isEditing = widget.buyer != null;
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.buyer == null ? 'Add Buyer' : 'Edit Buyer'),
+        title: Text(isEditing ? 'Edit Client' : 'New Client'),
       ),
       body: Form(
         key: _formKey,
@@ -74,65 +79,123 @@ class _BuyerFormScreenState extends State<BuyerFormScreen> {
           padding: const EdgeInsets.symmetric(horizontal: AppTheme.space16),
           children: [
             const SizedBox(height: AppTheme.space24),
-            TextFormField(
-              controller: _nameController,
-              decoration: const InputDecoration(
-                labelText: 'Name',
-                hintText: 'Enter buyer name',
+
+            // ── Form card (matching DESIGN modal) ──
+            Container(
+              padding: const EdgeInsets.all(AppTheme.space24),
+              decoration: BoxDecoration(
+                color: AppColors.surfaceContainerLowest,
+                borderRadius: BorderRadius.circular(AppTheme.radiusCard),
+                border: Border.all(color: AppColors.surfaceContainer),
+                boxShadow: AppTheme.cardShadow,
               ),
-              validator: (v) => v == null || v.isEmpty ? 'Required' : null,
-            ),
-            const SizedBox(height: AppTheme.space12),
-            TextFormField(
-              controller: _addressController,
-              decoration: const InputDecoration(
-                labelText: 'Address',
-                hintText: 'Enter buyer address',
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Client Details',
+                    style: AppTextStyles.h2.copyWith(
+                      color: AppColors.primary,
+                    ),
+                  ),
+                  const SizedBox(height: AppTheme.space24),
+
+                  // Full Name
+                  Text(
+                    'FULL NAME',
+                    style: AppTextStyles.labelBold.copyWith(
+                      color: AppColors.onSurfaceVariant,
+                    ),
+                  ),
+                  const SizedBox(height: AppTheme.space4),
+                  TextFormField(
+                    controller: _nameController,
+                    decoration: const InputDecoration(
+                      hintText: 'Enter full name',
+                    ),
+                    validator: (v) =>
+                        v == null || v.isEmpty ? 'Required' : null,
+                  ),
+                  const SizedBox(height: AppTheme.space16),
+
+                  // Address
+                  Text(
+                    'ADDRESS',
+                    style: AppTextStyles.labelBold.copyWith(
+                      color: AppColors.onSurfaceVariant,
+                    ),
+                  ),
+                  const SizedBox(height: AppTheme.space4),
+                  TextFormField(
+                    controller: _addressController,
+                    decoration: const InputDecoration(
+                      hintText: 'Enter address',
+                    ),
+                    maxLines: 2,
+                    validator: (v) =>
+                        v == null || v.isEmpty ? 'Required' : null,
+                  ),
+                  const SizedBox(height: AppTheme.space16),
+
+                  // Phone
+                  Text(
+                    'PHONE NUMBER',
+                    style: AppTextStyles.labelBold.copyWith(
+                      color: AppColors.onSurfaceVariant,
+                    ),
+                  ),
+                  const SizedBox(height: AppTheme.space4),
+                  TextFormField(
+                    controller: _phoneController,
+                    decoration: const InputDecoration(
+                      hintText: 'Enter phone number',
+                    ),
+                    keyboardType: TextInputType.phone,
+                    validator: (v) =>
+                        v == null || v.isEmpty ? 'Required' : null,
+                  ),
+                  const SizedBox(height: AppTheme.space16),
+
+                  // Email
+                  Text(
+                    'EMAIL ADDRESS',
+                    style: AppTextStyles.labelBold.copyWith(
+                      color: AppColors.onSurfaceVariant,
+                    ),
+                  ),
+                  const SizedBox(height: AppTheme.space4),
+                  TextFormField(
+                    controller: _emailController,
+                    decoration: const InputDecoration(
+                      hintText: 'Enter email address',
+                    ),
+                    keyboardType: TextInputType.emailAddress,
+                    validator: (v) =>
+                        v == null || v.isEmpty ? 'Required' : null,
+                  ),
+                ],
               ),
-              maxLines: 2,
-              validator: (v) => v == null || v.isEmpty ? 'Required' : null,
-            ),
-            const SizedBox(height: AppTheme.space12),
-            TextFormField(
-              controller: _phoneController,
-              decoration: const InputDecoration(
-                labelText: 'Phone',
-                hintText: 'Enter phone number',
-              ),
-              keyboardType: TextInputType.phone,
-              validator: (v) => v == null || v.isEmpty ? 'Required' : null,
-            ),
-            const SizedBox(height: AppTheme.space12),
-            TextFormField(
-              controller: _emailController,
-              decoration: const InputDecoration(
-                labelText: 'Email',
-                hintText: 'Enter email address',
-              ),
-              keyboardType: TextInputType.emailAddress,
-              validator: (v) => v == null || v.isEmpty ? 'Required' : null,
             ),
             const SizedBox(height: AppTheme.space100),
           ],
         ),
       ),
+
+      // ── Bottom action bar ──
       bottomNavigationBar: Container(
         padding: const EdgeInsets.all(AppTheme.space16),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black12,
-              blurRadius: 8,
-              offset: Offset(0, -4),
-            ),
-          ],
+        decoration: BoxDecoration(
+          color: AppColors.surfaceContainerLowest,
+          boxShadow: AppTheme.bottomBarShadow,
         ),
-        child: SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            onPressed: _save,
-            child: const Text('Save Buyer'),
+        child: SafeArea(
+          child: SizedBox(
+            width: double.infinity,
+            height: 56,
+            child: ElevatedButton(
+              onPressed: _save,
+              child: Text(isEditing ? 'Update Client' : 'Save Client'),
+            ),
           ),
         ),
       ),

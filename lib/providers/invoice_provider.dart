@@ -29,6 +29,8 @@ class InvoiceProvider extends ChangeNotifier {
   Future<void> initialize() async {
     if (kIsWeb) return; // Skip for web
     
+    await Future.microtask(() {});
+    
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();

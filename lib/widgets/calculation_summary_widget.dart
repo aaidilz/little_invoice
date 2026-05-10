@@ -4,6 +4,8 @@ import 'package:little_invoice/core/theme/app_text_styles.dart';
 import 'package:little_invoice/core/theme/app_theme.dart';
 import 'package:little_invoice/core/utils/currency_formatter.dart';
 
+/// Calculation summary card matching the DESIGN "Summary Card" pattern.
+/// Uses the primary-container dark background with amber accent total.
 class CalculationSummaryWidget extends StatelessWidget {
   final double subtotal;
   final double discountPercent;
@@ -26,56 +28,80 @@ class CalculationSummaryWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(AppTheme.space16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _buildRow('Subtotal', CurrencyFormatter.format(subtotal)),
-            _buildRow(
-              'Discount (${discountPercent.toStringAsFixed(1)}%)',
-              '– ${CurrencyFormatter.format(discountAmount)}',
-            ),
-            _buildRow(
-              'Tax (${taxPercent.toStringAsFixed(1)}%)',
-              '+ ${CurrencyFormatter.format(taxAmount)}',
-            ),
-            _buildRow('Down Payment', '– ${CurrencyFormatter.format(dpAmount)}'),
-            const Divider(),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Total',
-                  style: AppTextStyles.title,
+    return Container(
+      padding: const EdgeInsets.all(AppTheme.space24),
+      decoration: BoxDecoration(
+        color: AppColors.primaryContainer,
+        borderRadius: BorderRadius.circular(AppTheme.radiusCard),
+        boxShadow: AppTheme.cardShadow,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _buildRow(
+            'Subtotal',
+            CurrencyFormatter.format(subtotal),
+          ),
+          const SizedBox(height: AppTheme.space8),
+          _buildRow(
+            'Discount (${discountPercent.toStringAsFixed(1)}%)',
+            '– ${CurrencyFormatter.format(discountAmount)}',
+          ),
+          const SizedBox(height: AppTheme.space8),
+          _buildRow(
+            'Tax (${taxPercent.toStringAsFixed(1)}%)',
+            '+ ${CurrencyFormatter.format(taxAmount)}',
+          ),
+          const SizedBox(height: AppTheme.space8),
+          _buildRow(
+            'Down Payment',
+            '– ${CurrencyFormatter.format(dpAmount)}',
+          ),
+          const SizedBox(height: AppTheme.space12),
+          Container(
+            height: 1,
+            color: AppColors.onPrimaryContainer.withValues(alpha: 0.2),
+          ),
+          const SizedBox(height: AppTheme.space12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Total Due',
+                style: AppTextStyles.h2.copyWith(
+                  color: Colors.white,
                 ),
-                Text(
-                  CurrencyFormatter.format(total),
-                  style: AppTextStyles.title.copyWith(
-                    color: AppColors.primary,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 18,
-                  ),
+              ),
+              Text(
+                CurrencyFormatter.format(total),
+                style: AppTextStyles.statDisplay.copyWith(
+                  color: AppColors.secondaryContainer,
                 ),
-              ],
-            ),
-          ],
-        ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(label, style: AppTextStyles.caption),
-          Text(value, style: AppTextStyles.body),
-        ],
-      ),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: AppTextStyles.bodyMd.copyWith(
+            color: AppColors.onPrimaryContainer,
+          ),
+        ),
+        Text(
+          value,
+          style: AppTextStyles.labelBold.copyWith(
+            color: Colors.white,
+          ),
+        ),
+      ],
     );
   }
 }

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:little_invoice/core/theme/app_colors.dart';
+import 'package:little_invoice/core/theme/app_text_styles.dart';
 import 'package:little_invoice/core/theme/app_theme.dart';
 import 'package:little_invoice/models/seller_profile.dart';
 import 'package:little_invoice/providers/seller_provider.dart';
@@ -73,146 +75,274 @@ class _SellerProfileScreenState extends State<SellerProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('My Profile'),
-      ),
-      body: Consumer<SellerProvider>(
-        builder: (context, provider, child) {
-          if (provider.isLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          return Form(
-            key: _formKey,
-            child: ListView(
-              padding: const EdgeInsets.symmetric(horizontal: AppTheme.space16),
-              children: [
-                const SizedBox(height: AppTheme.space24),
-                Text(
-                  'Business Info',
-                  style: Theme.of(context).textTheme.headlineMedium,
+    return Consumer<SellerProvider>(
+      builder: (context, provider, child) {
+        if (provider.isLoading) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        return Form(
+          key: _formKey,
+          child: ListView(
+            padding: const EdgeInsets.symmetric(horizontal: AppTheme.space16),
+            children: [
+              const SizedBox(height: AppTheme.space16),
+
+              // ── Page header ──
+              Text(
+                'Seller Profile',
+                style: AppTextStyles.h1.copyWith(color: AppColors.primary),
+              ),
+              const SizedBox(height: AppTheme.space4),
+              Text(
+                'Manage your business identity and financial details for professional invoicing.',
+                style: AppTextStyles.bodyMd.copyWith(
+                  color: AppColors.onSurfaceVariant,
                 ),
-                const SizedBox(height: AppTheme.space12),
-                TextFormField(
-                  controller: _nameController,
-                  decoration: const InputDecoration(
-                    labelText: 'Business Name',
-                    hintText: 'Enter your business name',
-                  ),
-                  validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+              ),
+              const SizedBox(height: AppTheme.space24),
+
+              // ── Business Assets Section (matching DESIGN) ──
+              Container(
+                padding: const EdgeInsets.all(AppTheme.space16),
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceContainerLow,
+                  borderRadius: BorderRadius.circular(AppTheme.radiusCard),
+                  boxShadow: AppTheme.cardShadow,
                 ),
-                const SizedBox(height: AppTheme.space12),
-                TextFormField(
-                  controller: _addressController,
-                  decoration: const InputDecoration(
-                    labelText: 'Address',
-                    hintText: 'Enter your business address',
-                  ),
-                  maxLines: 2,
-                  validator: (v) => v == null || v.isEmpty ? 'Required' : null,
-                ),
-                const SizedBox(height: AppTheme.space12),
-                TextFormField(
-                  controller: _phoneController,
-                  decoration: const InputDecoration(
-                    labelText: 'Phone',
-                    hintText: 'Enter your phone number',
-                  ),
-                  keyboardType: TextInputType.phone,
-                ),
-                const SizedBox(height: AppTheme.space12),
-                TextFormField(
-                  controller: _emailController,
-                  decoration: const InputDecoration(
-                    labelText: 'Email',
-                    hintText: 'Enter your email address',
-                  ),
-                  keyboardType: TextInputType.emailAddress,
-                ),
-                const SizedBox(height: AppTheme.space12),
-                TextFormField(
-                  controller: _bankController,
-                  decoration: const InputDecoration(
-                    labelText: 'Bank Account',
-                    hintText: 'Bank name and account number',
-                  ),
-                ),
-                const SizedBox(height: AppTheme.space24),
-                Text(
-                  'Branding',
-                  style: Theme.of(context).textTheme.headlineMedium,
-                ),
-                const SizedBox(height: AppTheme.space12),
-                Row(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(
-                      child: Column(
-                        children: [
-                          ImagePickerWidget(
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.branding_watermark_outlined,
+                          size: 18,
+                          color: AppColors.primary,
+                        ),
+                        const SizedBox(width: AppTheme.space8),
+                        Text(
+                          'BUSINESS ASSETS',
+                          style: AppTextStyles.labelBold.copyWith(
+                            color: AppColors.primary,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: AppTheme.space16),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: ImagePickerWidget(
                             label: 'Logo',
                             currentPath: _logoPath,
                             onImageSelected: (path) {
                               setState(() => _logoPath = path);
                             },
                           ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: AppTheme.space12),
-                    Expanded(
-                      child: Column(
-                        children: [
-                          ImagePickerWidget(
+                        ),
+                        const SizedBox(width: AppTheme.space12),
+                        Expanded(
+                          child: ImagePickerWidget(
                             label: 'Stamp',
                             currentPath: _stampPath,
                             onImageSelected: (path) {
                               setState(() => _stampPath = path);
                             },
                           ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: AppTheme.space12),
-                    Expanded(
-                      child: Column(
-                        children: [
-                          ImagePickerWidget(
+                        ),
+                        const SizedBox(width: AppTheme.space12),
+                        Expanded(
+                          child: ImagePickerWidget(
                             label: 'Signature',
                             currentPath: _signaturePath,
                             onImageSelected: (path) {
                               setState(() => _signaturePath = path);
                             },
                           ),
-                        ],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: AppTheme.space16),
+
+              // ── General Information (matching DESIGN) ──
+              Container(
+                padding: const EdgeInsets.all(AppTheme.space24),
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceContainerLowest,
+                  borderRadius: BorderRadius.circular(AppTheme.radiusCard),
+                  border: Border.all(color: AppColors.surfaceContainer),
+                  boxShadow: AppTheme.cardShadow,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'General Information',
+                      style: AppTextStyles.h2.copyWith(
+                        color: AppColors.primary,
+                      ),
+                    ),
+                    const SizedBox(height: AppTheme.space16),
+
+                    const _FieldLabel('BUSINESS NAME'),
+                    const SizedBox(height: AppTheme.space4),
+                    TextFormField(
+                      controller: _nameController,
+                      decoration: const InputDecoration(
+                        hintText: 'Enter your business name',
+                      ),
+                      validator: (v) =>
+                          v == null || v.isEmpty ? 'Required' : null,
+                    ),
+                    const SizedBox(height: AppTheme.space16),
+
+                    const _FieldLabel('BUSINESS ADDRESS'),
+                    const SizedBox(height: AppTheme.space4),
+                    TextFormField(
+                      controller: _addressController,
+                      decoration: const InputDecoration(
+                        hintText: 'Enter your business address',
+                      ),
+                      maxLines: 2,
+                      validator: (v) =>
+                          v == null || v.isEmpty ? 'Required' : null,
+                    ),
+                    const SizedBox(height: AppTheme.space16),
+
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const _FieldLabel('EMAIL ADDRESS'),
+                              const SizedBox(height: AppTheme.space4),
+                              TextFormField(
+                                controller: _emailController,
+                                decoration: const InputDecoration(
+                                  hintText: 'Email',
+                                ),
+                                keyboardType: TextInputType.emailAddress,
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: AppTheme.space12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const _FieldLabel('PHONE NUMBER'),
+                              const SizedBox(height: AppTheme.space4),
+                              TextFormField(
+                                controller: _phoneController,
+                                decoration: const InputDecoration(
+                                  hintText: 'Phone',
+                                ),
+                                keyboardType: TextInputType.phone,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: AppTheme.space16),
+
+              // ── Bank Information (matching DESIGN) ──
+              Container(
+                padding: const EdgeInsets.all(AppTheme.space24),
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceContainerLowest,
+                  borderRadius: BorderRadius.circular(AppTheme.radiusCard),
+                  border: Border.all(color: AppColors.surfaceContainer),
+                  boxShadow: AppTheme.cardShadow,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: const BoxDecoration(
+                            color: AppColors.tertiaryFixed,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.account_balance,
+                            size: 20,
+                            color: AppColors.onTertiaryFixed,
+                          ),
+                        ),
+                        const SizedBox(width: AppTheme.space12),
+                        Text(
+                          'Bank Information',
+                          style: AppTextStyles.h2.copyWith(
+                            color: AppColors.primary,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: AppTheme.space16),
+
+                    const _FieldLabel('BANK ACCOUNT'),
+                    const SizedBox(height: AppTheme.space4),
+                    TextFormField(
+                      controller: _bankController,
+                      decoration: const InputDecoration(
+                        hintText: 'Bank name and account number',
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: AppTheme.space100),
-              ],
-            ),
-          );
-        },
-      ),
-      bottomNavigationBar: Container(
-        padding: const EdgeInsets.all(AppTheme.space16),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black12,
-              blurRadius: 8,
-              offset: Offset(0, -4),
-            ),
-          ],
-        ),
-        child: SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            onPressed: _save,
-            child: const Text('Save Profile'),
+              ),
+
+              const SizedBox(height: AppTheme.space24),
+
+              // ── Action Buttons (matching DESIGN) ──
+              Row(
+                children: [
+                  Expanded(
+                    child: SizedBox(
+                      height: 56,
+                      child: ElevatedButton.icon(
+                        onPressed: _save,
+                        icon: const Icon(Icons.save_outlined, size: 20),
+                        label: const Text('SAVE PROFILE'),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: AppTheme.space100),
+            ],
           ),
-        ),
+        );
+      },
+    );
+  }
+}
+
+class _FieldLabel extends StatelessWidget {
+  final String text;
+  const _FieldLabel(this.text);
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      text,
+      style: AppTextStyles.labelBold.copyWith(
+        color: AppColors.onSurfaceVariant,
       ),
     );
   }

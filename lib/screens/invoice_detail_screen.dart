@@ -6,6 +6,7 @@ import 'package:little_invoice/core/theme/app_theme.dart';
 import 'package:little_invoice/core/utils/currency_formatter.dart';
 import 'package:little_invoice/core/utils/date_formatter.dart';
 import 'package:little_invoice/models/invoice.dart';
+import 'package:little_invoice/models/buyer.dart';
 import 'package:little_invoice/providers/invoice_provider.dart';
 import 'package:little_invoice/providers/seller_provider.dart';
 import 'package:little_invoice/providers/buyer_provider.dart';
@@ -35,8 +36,12 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await context.read<InvoiceProvider>().getItemsForInvoice(widget.invoiceId);
-      setState(() => _isLoading = false);
+      await context
+          .read<InvoiceProvider>()
+          .getItemsForInvoice(widget.invoiceId);
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     });
   }
 
@@ -45,14 +50,16 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
     final buyers = context.read<BuyerProvider>().buyers;
     final buyer = buyers.firstWhere(
       (b) => b.id == invoice.buyerId,
-      orElse: () => throw Exception('Buyer not found'),
+      orElse: () => Buyer(id: invoice.buyerId, name: 'Unknown Client', address: '-', phone: '-', email: '-'),
     );
     final items = context.read<InvoiceProvider>().currentItems;
 
     if (seller == null) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please set up your seller profile first')),
+          const SnackBar(
+            content: Text('Please set up your seller profile first'),
+          ),
         );
       }
       return;
@@ -86,12 +93,6 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
         );
       }
     }
-  }
-
-  Future<void> _shareInvoice(Invoice invoice) async {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Share functionality coming soon')),
-    );
   }
 
   Future<void> _deleteInvoice(Invoice invoice) async {
@@ -142,7 +143,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
         final buyers = context.watch<BuyerProvider>().buyers;
         final buyer = buyers.firstWhere(
           (b) => b.id == invoice.buyerId,
-          orElse: () => throw Exception('Buyer not found'),
+          orElse: () => Buyer(id: invoice.buyerId, name: 'Unknown Client', address: '-', phone: '-', email: '-'),
         );
 
         final discountAmount = invoice.subtotal * (invoice.discount / 100);
@@ -153,8 +154,8 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
           appBar: AppBar(
             title: Text(invoice.invoiceNumber),
             actions: [
-              IconButton(
-                icon: const Icon(Icons.edit),
+              // Edit button matching DESIGN
+              TextButton.icon(
                 onPressed: () {
                   Navigator.push(
                     context,
@@ -165,10 +166,11 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                     ),
                   );
                 },
-              ),
-              IconButton(
-                icon: const Icon(Icons.delete),
-                onPressed: () => _deleteInvoice(invoice),
+                icon: const Icon(Icons.edit_outlined, size: 18),
+                label: Text(
+                  'Edit',
+                  style: AppTextStyles.labelBold,
+                ),
               ),
             ],
           ),
@@ -177,79 +179,324 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const SizedBox(height: AppTheme.space24),
-                _StatusBanner(
-                  status: invoice.status,
-                  onToggle: () => provider.toggleStatus(invoice.id!),
-                ),
-                const SizedBox(height: AppTheme.space24),
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(AppTheme.space16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _InfoRow(
-                                label: 'Seller',
-                                value: seller?.name ?? 'Not set',
-                              ),
-                            ),
-                            Expanded(
-                              child: _InfoRow(
-                                label: 'Buyer',
-                                value: buyer.name,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: AppTheme.space12),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _InfoRow(
-                                label: 'Issue Date',
-                                value: invoice.cityDate,
-                              ),
-                            ),
-                            Expanded(
-                              child: _InfoRow(
-                                label: 'Due Date',
-                                value: DateFormatter.formatShortDate(
-                                  invoice.dueDate,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+                const SizedBox(height: AppTheme.space16),
+
+                // ── Status & Actions Card (matching DESIGN) ──
+                Container(
+                  padding: const EdgeInsets.all(AppTheme.space24),
+                  decoration: BoxDecoration(
+                    color: AppColors.surfaceContainerLowest,
+                    borderRadius: BorderRadius.circular(AppTheme.radiusCard),
+                    border: Border.all(color: AppColors.surfaceVariant),
+                    boxShadow: AppTheme.cardShadow,
                   ),
-                ),
-                const SizedBox(height: AppTheme.space24),
-                Text(
-                  'Items',
-                  style: AppTextStyles.headline,
-                ),
-                const SizedBox(height: AppTheme.space12),
-                Card(
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _ItemTableHeader(),
-                      ...items.asMap().entries.map((entry) {
-                        final index = entry.key;
-                        final item = entry.value;
-                        return _ItemTableRow(
-                          index: index + 1,
-                          item: item,
-                        );
-                      }),
+                      Text(
+                        invoice.invoiceNumber,
+                        style: AppTextStyles.labelBold.copyWith(
+                          color: AppColors.onSurfaceVariant,
+                        ),
+                      ),
+                      const SizedBox(height: AppTheme.space8),
+                      Row(
+                        children: [
+                          StatusBadgeWidget(status: invoice.status),
+                          const SizedBox(width: AppTheme.space12),
+                          TextButton(
+                            onPressed: () =>
+                                provider.toggleStatus(invoice.id!),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  'Change Status',
+                                  style: AppTextStyles.labelBold.copyWith(
+                                    color: AppColors.primary,
+                                  ),
+                                ),
+                                const SizedBox(width: 4),
+                                const Icon(
+                                  Icons.swap_horiz,
+                                  size: 16,
+                                  color: AppColors.primary,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: AppTheme.space16),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              onPressed: () => _generatePdf(invoice),
+                              icon: const Icon(Icons.download, size: 18),
+                              label: const Text('Export PDF'),
+                            ),
+                          ),
+                          const SizedBox(width: AppTheme.space12),
+                          SizedBox(
+                            height: 56,
+                            child: OutlinedButton(
+                              onPressed: () => _deleteInvoice(invoice),
+                              style: OutlinedButton.styleFrom(
+                                side: const BorderSide(
+                                  color: AppColors.error,
+                                ),
+                                foregroundColor: AppColors.error,
+                              ),
+                              child: const Icon(Icons.delete_outline),
+                            ),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
                 ),
-                const SizedBox(height: AppTheme.space24),
+
+                const SizedBox(height: AppTheme.space16),
+
+                // ── Billing Details Card (matching DESIGN) ──
+                Container(
+                  padding: const EdgeInsets.all(AppTheme.space24),
+                  decoration: BoxDecoration(
+                    color: AppColors.surfaceContainerLowest,
+                    borderRadius: BorderRadius.circular(AppTheme.radiusCard),
+                    border: Border.all(color: AppColors.surfaceVariant),
+                    boxShadow: AppTheme.cardShadow,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Billing Details',
+                        style: AppTextStyles.h2.copyWith(
+                          color: AppColors.primary,
+                        ),
+                      ),
+                      const SizedBox(height: AppTheme.space4),
+                      const Divider(),
+                      const SizedBox(height: AppTheme.space16),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: _LabeledInfo(
+                              label: 'FROM',
+                              value: seller?.name ?? 'Not set',
+                              subtitle: seller?.address,
+                            ),
+                          ),
+                          const SizedBox(width: AppTheme.space16),
+                          Expanded(
+                            child: _LabeledInfo(
+                              label: 'BILL TO',
+                              value: buyer.name,
+                              subtitle: buyer.address,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: AppTheme.space16),
+
+                // ── Quick Info Card ──
+                Container(
+                  padding: const EdgeInsets.all(AppTheme.space24),
+                  decoration: BoxDecoration(
+                    color: AppColors.surfaceContainerLowest,
+                    borderRadius: BorderRadius.circular(AppTheme.radiusCard),
+                    border: Border.all(color: AppColors.surfaceVariant),
+                    boxShadow: AppTheme.cardShadow,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Quick Info',
+                        style: AppTextStyles.h2.copyWith(
+                          color: AppColors.primary,
+                        ),
+                      ),
+                      const SizedBox(height: AppTheme.space4),
+                      const Divider(),
+                      const SizedBox(height: AppTheme.space16),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _LabeledInfo(
+                              label: 'ISSUE DATE',
+                              value: invoice.cityDate,
+                            ),
+                          ),
+                          Expanded(
+                            child: _LabeledInfo(
+                              label: 'DUE DATE',
+                              value: DateFormatter.formatShortDate(
+                                invoice.dueDate,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: AppTheme.space16),
+
+                // ── Items Table (matching DESIGN) ──
+                Container(
+                  clipBehavior: Clip.antiAlias,
+                  decoration: BoxDecoration(
+                    color: AppColors.surfaceContainerLowest,
+                    borderRadius: BorderRadius.circular(AppTheme.radiusCard),
+                    border: Border.all(color: AppColors.surfaceVariant),
+                    boxShadow: AppTheme.cardShadow,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Header
+                      Container(
+                        padding: const EdgeInsets.all(AppTheme.space24),
+                        decoration: const BoxDecoration(
+                          color: AppColors.surfaceContainerLow,
+                          border: Border(
+                            bottom: BorderSide(
+                              color: AppColors.surfaceVariant,
+                            ),
+                          ),
+                        ),
+                        child: Text(
+                          'Services & Items',
+                          style: AppTextStyles.h2.copyWith(
+                            color: AppColors.primary,
+                          ),
+                        ),
+                      ),
+
+                      // Table Header
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppTheme.space24,
+                          vertical: AppTheme.space12,
+                        ),
+                        color: AppColors.surfaceContainerLow.withValues(alpha: 0.5),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              flex: 3,
+                              child: Text(
+                                'DESCRIPTION',
+                                style: AppTextStyles.labelBold.copyWith(
+                                  color: AppColors.onSurfaceVariant,
+                                ),
+                              ),
+                            ),
+                            SizedBox(
+                              width: 48,
+                              child: Text(
+                                'QTY',
+                                style: AppTextStyles.labelBold.copyWith(
+                                  color: AppColors.onSurfaceVariant,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                            SizedBox(
+                              width: 80,
+                              child: Text(
+                                'PRICE',
+                                style: AppTextStyles.labelBold.copyWith(
+                                  color: AppColors.onSurfaceVariant,
+                                ),
+                                textAlign: TextAlign.right,
+                              ),
+                            ),
+                            SizedBox(
+                              width: 80,
+                              child: Text(
+                                'TOTAL',
+                                style: AppTextStyles.labelBold.copyWith(
+                                  color: AppColors.onSurfaceVariant,
+                                ),
+                                textAlign: TextAlign.right,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      // Item Rows
+                      ...items.map((item) => Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: AppTheme.space24,
+                              vertical: AppTheme.space16,
+                            ),
+                            decoration: const BoxDecoration(
+                              border: Border(
+                                bottom: BorderSide(
+                                  color: AppColors.surfaceVariant,
+                                  width: 0.5,
+                                ),
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  flex: 3,
+                                  child: Text(
+                                    item.description,
+                                    style: AppTextStyles.bodyMd.copyWith(
+                                      color: AppColors.primary,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 48,
+                                  child: Text(
+                                    item.quantity.toString(),
+                                    style: AppTextStyles.bodyMd,
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 80,
+                                  child: Text(
+                                    CurrencyFormatter.format(item.price),
+                                    style: AppTextStyles.bodyMd,
+                                    textAlign: TextAlign.right,
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 80,
+                                  child: Text(
+                                    CurrencyFormatter.format(item.lineTotal),
+                                    style: AppTextStyles.bodyMd.copyWith(
+                                      color: AppColors.primary,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                    textAlign: TextAlign.right,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: AppTheme.space16),
+
+                // ── Calculation Summary ──
                 CalculationSummaryWidget(
                   subtotal: invoice.subtotal,
                   discountPercent: invoice.discount,
@@ -259,60 +506,40 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                   dpAmount: invoice.dp,
                   total: invoice.total,
                 ),
+
+                // ── Notes ──
                 if (invoice.notes != null && invoice.notes!.isNotEmpty) ...[
-                  const SizedBox(height: AppTheme.space24),
-                  Card(
-                    color: AppColors.surfaceVariant,
-                    child: Padding(
-                      padding: const EdgeInsets.all(AppTheme.space16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Notes',
-                            style: AppTextStyles.label,
+                  const SizedBox(height: AppTheme.space16),
+                  Container(
+                    padding: const EdgeInsets.all(AppTheme.space24),
+                    decoration: BoxDecoration(
+                      color: AppColors.surfaceContainerLowest,
+                      borderRadius: BorderRadius.circular(AppTheme.radiusCard),
+                      border: Border.all(color: AppColors.surfaceVariant),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'REMARKS',
+                          style: AppTextStyles.labelBold.copyWith(
+                            color: AppColors.onSurfaceVariant,
                           ),
-                          const SizedBox(height: AppTheme.space8),
-                          Text(
-                            invoice.notes!,
-                            style: AppTextStyles.body,
+                        ),
+                        const SizedBox(height: AppTheme.space8),
+                        Text(
+                          invoice.notes!,
+                          style: AppTextStyles.bodyMd.copyWith(
+                            color: AppColors.onSurfaceVariant,
+                            fontStyle: FontStyle.italic,
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
+
                 const SizedBox(height: AppTheme.space100),
-              ],
-            ),
-          ),
-          bottomNavigationBar: Container(
-            padding: const EdgeInsets.all(AppTheme.space16),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black12,
-                  blurRadius: 8,
-                  offset: Offset(0, -4),
-                ),
-              ],
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () => _generatePdf(invoice),
-                    child: const Text('Generate PDF'),
-                  ),
-                ),
-                const SizedBox(width: AppTheme.space12),
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () => _shareInvoice(invoice),
-                    child: const Text('Share'),
-                  ),
-                ),
               ],
             ),
           ),
@@ -322,53 +549,16 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
   }
 }
 
-class _StatusBanner extends StatelessWidget {
-  final InvoiceStatus status;
-  final VoidCallback onToggle;
-
-  const _StatusBanner({
-    required this.status,
-    required this.onToggle,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final isPaid = status == InvoiceStatus.paid;
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppTheme.space16,
-        vertical: AppTheme.space12,
-      ),
-      decoration: BoxDecoration(
-        color: isPaid ? AppColors.paidContainer : AppColors.unpaidContainer,
-        borderRadius: BorderRadius.circular(AppTheme.radiusCard),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          StatusBadgeWidget(status: status),
-          TextButton(
-            onPressed: onToggle,
-            child: Text(
-              isPaid ? 'Mark as Unpaid' : 'Mark as Paid',
-              style: AppTextStyles.label.copyWith(
-                color: isPaid ? AppColors.paid : AppColors.unpaid,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _InfoRow extends StatelessWidget {
+/// Labeled info block matching DESIGN's FROM / BILL TO pattern.
+class _LabeledInfo extends StatelessWidget {
   final String label;
   final String value;
+  final String? subtitle;
 
-  const _InfoRow({
+  const _LabeledInfo({
     required this.label,
     required this.value,
+    this.subtitle,
   });
 
   @override
@@ -378,132 +568,28 @@ class _InfoRow extends StatelessWidget {
       children: [
         Text(
           label,
-          style: AppTextStyles.caption,
+          style: AppTextStyles.labelBold.copyWith(
+            color: AppColors.onSurfaceVariant,
+          ),
         ),
         const SizedBox(height: AppTheme.space4),
         Text(
           value,
-          style: AppTextStyles.body,
+          style: AppTextStyles.bodyMd.copyWith(
+            color: AppColors.primary,
+            fontWeight: FontWeight.w600,
+          ),
         ),
+        if (subtitle != null) ...[
+          const SizedBox(height: AppTheme.space2),
+          Text(
+            subtitle!,
+            style: AppTextStyles.bodyMd.copyWith(
+              color: AppColors.onSurfaceVariant,
+            ),
+          ),
+        ],
       ],
-    );
-  }
-}
-
-class _ItemTableHeader extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppTheme.space16,
-        vertical: AppTheme.space12,
-      ),
-      color: AppColors.surfaceVariant,
-      child: Row(
-        children: [
-          SizedBox(
-            width: 40,
-            child: Text(
-              'No.',
-              style: AppTextStyles.label,
-              textAlign: TextAlign.center,
-            ),
-          ),
-          Expanded(
-            child: Text(
-              'Description',
-              style: AppTextStyles.label,
-            ),
-          ),
-          SizedBox(
-            width: 60,
-            child: Text(
-              'Qty',
-              style: AppTextStyles.label,
-              textAlign: TextAlign.center,
-            ),
-          ),
-          SizedBox(
-            width: 80,
-            child: Text(
-              'Price',
-              style: AppTextStyles.label,
-              textAlign: TextAlign.right,
-            ),
-          ),
-          SizedBox(
-            width: 80,
-            child: Text(
-              'Total',
-              style: AppTextStyles.label,
-              textAlign: TextAlign.right,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ItemTableRow extends StatelessWidget {
-  final int index;
-  final dynamic item;
-
-  const _ItemTableRow({
-    required this.index,
-    required this.item,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppTheme.space16,
-        vertical: AppTheme.space12,
-      ),
-      color: index % 2 == 0 ? Colors.white : AppColors.surfaceVariant,
-      child: Row(
-        children: [
-          SizedBox(
-            width: 40,
-            child: Text(
-              index.toString(),
-              style: AppTextStyles.body,
-              textAlign: TextAlign.center,
-            ),
-          ),
-          Expanded(
-            child: Text(
-              item.description,
-              style: AppTextStyles.body,
-            ),
-          ),
-          SizedBox(
-            width: 60,
-            child: Text(
-              item.quantity.toString(),
-              style: AppTextStyles.body,
-              textAlign: TextAlign.center,
-            ),
-          ),
-          SizedBox(
-            width: 80,
-            child: Text(
-              CurrencyFormatter.format(item.price),
-              style: AppTextStyles.body,
-              textAlign: TextAlign.right,
-            ),
-          ),
-          SizedBox(
-            width: 80,
-            child: Text(
-              CurrencyFormatter.format(item.lineTotal),
-              style: AppTextStyles.body,
-              textAlign: TextAlign.right,
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

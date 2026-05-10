@@ -1,4 +1,4 @@
-package com.example.my_app
+package com.penacode.little_invoice
 
 import io.flutter.embedding.android.FlutterActivity
 

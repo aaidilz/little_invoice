@@ -4,7 +4,6 @@ import 'package:little_invoice/models/seller_profile.dart';
 import 'package:little_invoice/providers/buyer_provider.dart';
 import 'package:little_invoice/providers/seller_provider.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
-import 'package:sqflite/sqflite.dart';
 
 void main() {
   setUpAll(() {

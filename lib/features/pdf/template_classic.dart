@@ -192,7 +192,7 @@ class TemplateClassic {
             pw.SizedBox(height: 8),
             pw.Text(
               seller.name,
-              style: pw.TextStyle(fontSize: 10, decoration: pw.TextDecoration.underline),
+              style: const pw.TextStyle(fontSize: 10, decoration: pw.TextDecoration.underline),
             ),
           ],
         ),

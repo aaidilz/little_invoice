@@ -28,25 +28,25 @@ void main() {
     });
 
     test('With discount', () {
-      final subtotal = 350000.0;
+      const subtotal = 350000.0;
       final afterDiscount = calculator.applyDiscount(subtotal, 10);
       expect(afterDiscount, 315000);
     });
 
     test('With tax', () {
-      final afterDiscount = 315000.0;
+      const afterDiscount = 315000.0;
       final afterTax = calculator.applyTax(afterDiscount, 11);
       expect(afterTax, 349650);
     });
 
     test('With DP', () {
-      final afterTax = 349650.0;
+      const afterTax = 349650.0;
       final total = calculator.applyDP(afterTax, 100000);
       expect(total, 249650);
     });
 
     test('DP exceeds total (clamped)', () {
-      final afterTax = 100000.0;
+      const afterTax = 100000.0;
       final total = calculator.applyDP(afterTax, 150000);
       expect(total, 0);
     });

@@ -8,7 +8,6 @@ import 'package:little_invoice/models/invoice.dart';
 import 'package:little_invoice/models/invoice_item.dart';
 import 'package:little_invoice/models/seller_profile.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
-import 'package:sqflite/sqflite.dart';
 
 void main() {
   setUpAll(() {

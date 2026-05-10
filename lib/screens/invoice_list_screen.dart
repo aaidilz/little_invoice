@@ -51,128 +51,109 @@ class _InvoiceListScreenState extends State<InvoiceListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Invoices'),
-      ),
-      body: Consumer<InvoiceProvider>(
-        builder: (context, provider, child) {
-          if (provider.isLoading && provider.invoices.isEmpty) {
-            return const Center(child: CircularProgressIndicator());
-          }
+    return Consumer<InvoiceProvider>(
+      builder: (context, provider, child) {
+        if (provider.isLoading && provider.invoices.isEmpty) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
-          final filteredInvoices = _getFilteredInvoices(provider.invoices);
+        final filteredInvoices = _getFilteredInvoices(provider.invoices);
 
-          return Column(
-            children: [
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppTheme.space16,
-                  vertical: AppTheme.space12,
-                ),
-                child: Row(
-                  children: [
-                    _FilterChip(
-                      label: 'All',
-                      isSelected: _filterStatus == null,
-                      onTap: () {
-                        setState(() {
-                          _filterStatus = null;
-                        });
-                      },
-                    ),
-                    const SizedBox(width: AppTheme.space8),
-                    _FilterChip(
-                      label: 'Unpaid',
-                      isSelected: _filterStatus == InvoiceStatus.unpaid,
-                      onTap: () {
-                        setState(() {
-                          _filterStatus = InvoiceStatus.unpaid;
-                        });
-                      },
-                    ),
-                    const SizedBox(width: AppTheme.space8),
-                    _FilterChip(
-                      label: 'Paid',
-                      isSelected: _filterStatus == InvoiceStatus.paid,
-                      onTap: () {
-                        setState(() {
-                          _filterStatus = InvoiceStatus.paid;
-                        });
-                      },
-                    ),
-                  ],
-                ),
+        return Column(
+          children: [
+            // ── Filter chips (matching DESIGN segmented control) ──
+            Container(
+              margin: const EdgeInsets.all(AppTheme.space16),
+              padding: const EdgeInsets.all(AppTheme.space4),
+              decoration: BoxDecoration(
+                color: AppColors.surfaceContainer,
+                borderRadius: BorderRadius.circular(AppTheme.radiusCard),
+                border: Border.all(color: AppColors.outlineVariant),
               ),
-              Expanded(
-                child: filteredInvoices.isEmpty
-                    ? EmptyStateWidget(
-                        icon: Icons.receipt_long_outlined,
-                        headline: 'No invoices',
-                        body: _filterStatus == null
-                            ? 'Create your first invoice'
-                            : 'No ${_filterStatus!.name} invoices',
-                        ctaLabel: 'Create Invoice',
-                        onCta: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const InvoiceFormScreen(),
-                            ),
-                          );
-                        },
-                      )
-                    : ListView.separated(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: AppTheme.space16,
-                          vertical: AppTheme.space12,
-                        ),
-                        itemCount: filteredInvoices.length,
-                        separatorBuilder: (_, __) =>
-                            const SizedBox(height: AppTheme.space12),
-                        itemBuilder: (ctx, idx) {
-                          final invoice = filteredInvoices[idx];
-                          return InvoiceCard(
-                            invoice: invoice,
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => InvoiceDetailScreen(
-                                    invoiceId: invoice.id!,
-                                  ),
-                                ),
-                              );
-                            },
-                          );
-                        },
+              child: Row(
+                children: [
+                  _FilterTab(
+                    label: 'All',
+                    isSelected: _filterStatus == null,
+                    onTap: () => setState(() => _filterStatus = null),
+                  ),
+                  _FilterTab(
+                    label: 'Unpaid',
+                    isSelected: _filterStatus == InvoiceStatus.unpaid,
+                    onTap: () => setState(
+                      () => _filterStatus = InvoiceStatus.unpaid,
+                    ),
+                  ),
+                  _FilterTab(
+                    label: 'Paid',
+                    isSelected: _filterStatus == InvoiceStatus.paid,
+                    onTap: () => setState(
+                      () => _filterStatus = InvoiceStatus.paid,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // ── List ──
+            Expanded(
+              child: filteredInvoices.isEmpty
+                  ? EmptyStateWidget(
+                      icon: Icons.receipt_long_outlined,
+                      headline: 'No invoices',
+                      body: _filterStatus == null
+                          ? 'Create your first invoice'
+                          : 'No ${_filterStatus!.name} invoices',
+                      ctaLabel: 'Create Invoice',
+                      onCta: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const InvoiceFormScreen(),
+                          ),
+                        );
+                      },
+                    )
+                  : ListView.separated(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppTheme.space16,
+                        vertical: AppTheme.space8,
                       ),
-              ),
-            ],
-          );
-        },
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const InvoiceFormScreen()),
-          );
-        },
-        label: const Text('New Invoice'),
-        icon: const Icon(Icons.add),
-      ),
+                      itemCount: filteredInvoices.length,
+                      separatorBuilder: (_, __) =>
+                          const SizedBox(height: AppTheme.space12),
+                      itemBuilder: (ctx, idx) {
+                        final invoice = filteredInvoices[idx];
+                        return InvoiceCard(
+                          invoice: invoice,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => InvoiceDetailScreen(
+                                  invoiceId: invoice.id!,
+                                ),
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    ),
+            ),
+          ],
+        );
+      },
     );
   }
 }
 
-class _FilterChip extends StatelessWidget {
+/// Segmented filter tab matching DESIGN's template selector.
+class _FilterTab extends StatelessWidget {
   final String label;
   final bool isSelected;
   final VoidCallback onTap;
 
-  const _FilterChip({
+  const _FilterTab({
     required this.label,
     required this.isSelected,
     required this.onTap,
@@ -180,26 +161,41 @@ class _FilterChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FilterChip(
-      label: Text(
-        label,
-        style: AppTextStyles.labelBold,
-      ),
-      selected: isSelected,
-      onSelected: (_) => onTap(),
-      selectedColor: AppColors.primary,
-      labelStyle: TextStyle(
-        color: isSelected
-            ? AppColors.onPrimary
-            : AppColors.onSurfaceVariant,
-      ),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppTheme.radiusChip),
-      ),
-      side: BorderSide(
-        color: isSelected
-            ? AppColors.primary
-            : AppColors.outline,
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          decoration: BoxDecoration(
+            color: isSelected
+                ? AppColors.surfaceContainerLowest
+                : Colors.transparent,
+            borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
+            boxShadow: isSelected
+                ? [
+                    const BoxShadow(
+                      color: AppColors.customShadow,
+                      blurRadius: 4,
+                      offset: Offset(0, 1),
+                    ),
+                  ]
+                : null,
+            border: isSelected
+                ? Border.all(color: AppColors.outlineVariant)
+                : null,
+          ),
+          child: Center(
+            child: Text(
+              label,
+              style: AppTextStyles.labelBold.copyWith(
+                color: isSelected
+                    ? AppColors.primary
+                    : AppColors.onSurfaceVariant,
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

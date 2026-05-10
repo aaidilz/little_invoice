@@ -1,7 +1,6 @@
 import 'package:little_invoice/core/database/database_helper.dart';
 import 'package:little_invoice/models/seller_profile.dart';
 import 'package:little_invoice/core/database/database_exception.dart';
-import 'package:sqflite/sqflite.dart' hide DatabaseException;
 
 class SellerDao {
   final dbHelper = DatabaseHelper.instance;

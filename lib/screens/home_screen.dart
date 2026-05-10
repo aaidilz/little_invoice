@@ -23,11 +23,47 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
 
+  static const _navItems = [
+    _NavItem(Icons.dashboard_outlined, Icons.dashboard, 'Dashboard'),
+    _NavItem(Icons.receipt_long_outlined, Icons.receipt_long, 'Invoices'),
+    _NavItem(Icons.people_outline, Icons.people, 'Clients'),
+    _NavItem(Icons.person_outline, Icons.person, 'Profile'),
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // ── AppBar matching DESIGN TopAppBar ──
       appBar: AppBar(
-        title: const Text('InvoiceKu'),
+        title: Row(
+          children: [
+            Container(
+              width: 32,
+              height: 32,
+              decoration: const BoxDecoration(
+                color: AppColors.primaryContainer,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.business_center,
+                size: 18,
+                color: AppColors.onPrimaryContainer,
+              ),
+            ),
+            const SizedBox(width: AppTheme.space12),
+            Text(
+              'Invoicely',
+              style: AppTextStyles.h1.copyWith(color: AppColors.primary),
+            ),
+          ],
+        ),
+        actions: [
+          IconButton(
+            onPressed: () {},
+            icon: const Icon(Icons.account_circle_outlined),
+            color: AppColors.onSurfaceVariant,
+          ),
+        ],
       ),
       body: IndexedStack(
         index: _currentIndex,
@@ -38,52 +74,102 @@ class _HomeScreenState extends State<HomeScreen> {
           SellerProfileScreen(),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined),
-            activeIcon: Icon(Icons.home),
-            label: 'Home',
+
+      // ── Bottom Nav matching DESIGN BottomNavBar ──
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: const BorderRadius.vertical(
+            top: Radius.circular(16),
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.receipt_long_outlined),
-            activeIcon: Icon(Icons.receipt_long),
-            label: 'Invoices',
+          boxShadow: AppTheme.bottomBarShadow,
+        ),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: List.generate(_navItems.length, (i) {
+                final item = _navItems[i];
+                final isSelected = _currentIndex == i;
+                return _buildNavItem(item, isSelected, () {
+                  setState(() => _currentIndex = i);
+                });
+              }),
+            ),
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.people_outline),
-            activeIcon: Icon(Icons.people),
-            label: 'Buyers',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline),
-            activeIcon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-        ],
+        ),
       ),
+
+      // ── FAB ──
       floatingActionButton: _currentIndex == 0 || _currentIndex == 1
-          ? FloatingActionButton.extended(
+          ? FloatingActionButton(
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => InvoiceFormScreen()),
+                  MaterialPageRoute(builder: (_) => const InvoiceFormScreen()),
                 );
               },
-              label: const Text('New Invoice'),
-              icon: const Icon(Icons.add),
+              child: const Icon(Icons.add, size: 28),
             )
           : null,
     );
   }
+
+  Widget _buildNavItem(
+    _NavItem item,
+    bool isSelected,
+    VoidCallback onTap,
+  ) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(AppTheme.radiusCard),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? AppColors.primaryContainer
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(AppTheme.radiusCard),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              isSelected ? item.activeIcon : item.icon,
+              size: 24,
+              color: isSelected
+                  ? AppColors.onPrimaryContainer
+                  : AppColors.onSurfaceVariant,
+            ),
+            const SizedBox(height: 2),
+            Text(
+              item.label,
+              style: AppTextStyles.labelBold.copyWith(
+                color: isSelected
+                    ? AppColors.onPrimaryContainer
+                    : AppColors.onSurfaceVariant,
+                fontSize: 11,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
+class _NavItem {
+  final IconData icon;
+  final IconData activeIcon;
+  final String label;
+  const _NavItem(this.icon, this.activeIcon, this.label);
+}
+
+// ─────────────────────────────────────────────────────────────
+// Home Tab (Dashboard)
+// ─────────────────────────────────────────────────────────────
 class _HomeTab extends StatelessWidget {
   const _HomeTab();
 
@@ -99,6 +185,8 @@ class _HomeTab extends StatelessWidget {
         final totalInvoices = invoices.length;
         final unpaidInvoices =
             invoices.where((i) => i.status == InvoiceStatus.unpaid).toList();
+        final paidInvoices =
+            invoices.where((i) => i.status == InvoiceStatus.paid).toList();
         final totalAmountDue =
             unpaidInvoices.fold(0.0, (sum, i) => sum + i.total);
 
@@ -110,37 +198,59 @@ class _HomeTab extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: AppTheme.space16),
+
+              // ── Stats Bento Grid (matching DESIGN) ──
               Row(
                 children: [
                   Expanded(
                     child: _StatCard(
-                      label: 'Total Invoices',
+                      label: 'TOTAL INVOICES',
                       value: totalInvoices.toString(),
+                      icon: Icons.receipt_long_outlined,
                     ),
                   ),
                   const SizedBox(width: AppTheme.space12),
                   Expanded(
                     child: _StatCard(
-                      label: 'Unpaid',
+                      label: 'UNPAID',
                       value: unpaidInvoices.length.toString(),
-                    ),
-                  ),
-                  const SizedBox(width: AppTheme.space12),
-                  Expanded(
-                    child: _StatCard(
-                      label: 'Amount Due',
-                      value: CurrencyFormatter.formatCompact(totalAmountDue),
+                      icon: Icons.pending_actions_outlined,
                     ),
                   ),
                 ],
               ),
+              const SizedBox(height: AppTheme.space12),
+              Row(
+                children: [
+                  Expanded(
+                    child: _StatCard(
+                      label: 'PAID',
+                      value: paidInvoices.length.toString(),
+                      icon: Icons.check_circle_outline,
+                    ),
+                  ),
+                  const SizedBox(width: AppTheme.space12),
+                  Expanded(
+                    child: _StatCard(
+                      label: 'AMOUNT DUE',
+                      value: CurrencyFormatter.formatCompact(totalAmountDue),
+                      icon: Icons.account_balance_wallet_outlined,
+                    ),
+                  ),
+                ],
+              ),
+
               const SizedBox(height: AppTheme.space24),
+
+              // ── Recent invoices header ──
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
                     'Recent Invoices',
-                    style: AppTextStyles.h1,
+                    style: AppTextStyles.h2.copyWith(
+                      color: AppColors.primary,
+                    ),
                   ),
                   TextButton(
                     onPressed: () {
@@ -151,30 +261,49 @@ class _HomeTab extends StatelessWidget {
                         ),
                       );
                     },
-                    child: Text(
-                      'See All',
-                      style: AppTextStyles.labelBold.copyWith(
-                        color: AppColors.secondary,
-                      ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'See All',
+                          style: AppTextStyles.labelBold.copyWith(
+                            color: AppColors.secondary,
+                          ),
+                        ),
+                        const SizedBox(width: 2),
+                        const Icon(
+                          Icons.arrow_forward,
+                          size: 14,
+                          color: AppColors.secondary,
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: AppTheme.space12),
+
+              // ── Invoice list ──
               recentInvoices.isEmpty
-                  ? EmptyStateWidget(
-                      icon: Icons.receipt_long_outlined,
-                      headline: 'No invoices yet',
-                      body: 'Create your first invoice to get started',
-                      ctaLabel: 'Create Invoice',
-                      onCta: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => InvoiceFormScreen(),
-                          ),
-                        );
-                      },
+                  ? Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: AppTheme.space32,
+                      ),
+                      child: EmptyStateWidget(
+                        icon: Icons.receipt_long_outlined,
+                        headline: 'No invoices yet',
+                        body:
+                            'Create your first invoice to get started with Invoicely',
+                        ctaLabel: 'Create Invoice',
+                        onCta: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const InvoiceFormScreen(),
+                            ),
+                          );
+                        },
+                      ),
                     )
                   : Column(
                       children: recentInvoices
@@ -198,6 +327,9 @@ class _HomeTab extends StatelessWidget {
                               ))
                           .toList(),
                     ),
+
+              // Bottom breathing room for FAB
+              const SizedBox(height: AppTheme.space100),
             ],
           ),
         );
@@ -206,36 +338,53 @@ class _HomeTab extends StatelessWidget {
   }
 }
 
+// ─────────────────────────────────────────────────────────────
+// Stat Card (Bento style, matching DESIGN Stats section)
+// ─────────────────────────────────────────────────────────────
 class _StatCard extends StatelessWidget {
   final String label;
   final String value;
+  final IconData icon;
 
   const _StatCard({
     required this.label,
     required this.value,
+    required this.icon,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(AppTheme.space16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              value,
-              style: AppTextStyles.statDisplay.copyWith(
-                color: AppColors.primary,
-              ),
+    return Container(
+      padding: const EdgeInsets.all(AppTheme.space16),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceContainerLowest,
+        borderRadius: BorderRadius.circular(AppTheme.radiusCard),
+        border: Border.all(color: AppColors.surfaceContainer),
+        boxShadow: AppTheme.cardShadow,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            icon,
+            size: 20,
+            color: AppColors.onSurfaceVariant,
+          ),
+          const SizedBox(height: AppTheme.space8),
+          Text(
+            label,
+            style: AppTextStyles.labelBold.copyWith(
+              color: AppColors.onSurfaceVariant,
             ),
-            const SizedBox(height: AppTheme.space4),
-            Text(
-              label,
-              style: AppTextStyles.bodyMd,
+          ),
+          const SizedBox(height: AppTheme.space4),
+          Text(
+            value,
+            style: AppTextStyles.statDisplay.copyWith(
+              color: AppColors.primary,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

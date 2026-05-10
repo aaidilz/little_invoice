@@ -6,6 +6,8 @@ import 'package:little_invoice/core/theme/app_colors.dart';
 import 'package:little_invoice/core/theme/app_text_styles.dart';
 import 'package:little_invoice/core/theme/app_theme.dart';
 
+/// Image picker with dashed-border placeholder matching the DESIGN
+/// "Business Assets" upload cards.
 class ImagePickerWidget extends StatelessWidget {
   final String label;
   final String? currentPath;
@@ -30,14 +32,7 @@ class ImagePickerWidget extends StatelessWidget {
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to load image: $e'),
-            backgroundColor: AppColors.error,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(AppTheme.radiusCard),
-            ),
-          ),
+          SnackBar(content: Text('Failed to load image: $e')),
         );
       }
     }
@@ -48,26 +43,29 @@ class ImagePickerWidget extends StatelessWidget {
       context: context,
       builder: (ctx) {
         return SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                leading: const Icon(Icons.camera_alt),
-                title: const Text('Camera'),
-                onTap: () {
-                  Navigator.pop(ctx);
-                  _pickImage(context, ImageSource.camera);
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.photo_library),
-                title: const Text('Gallery'),
-                onTap: () {
-                  Navigator.pop(ctx);
-                  _pickImage(context, ImageSource.gallery);
-                },
-              ),
-            ],
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: AppTheme.space8),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.camera_alt_outlined),
+                  title: Text('Camera', style: AppTextStyles.bodyLg),
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    _pickImage(context, ImageSource.camera);
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.photo_library_outlined),
+                  title: Text('Gallery', style: AppTextStyles.bodyLg),
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    _pickImage(context, ImageSource.gallery);
+                  },
+                ),
+              ],
+            ),
           ),
         );
       },
@@ -79,20 +77,27 @@ class ImagePickerWidget extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: AppTextStyles.label),
+        Text(
+          label,
+          style: AppTextStyles.labelBold.copyWith(
+            color: AppColors.onSurfaceVariant,
+          ),
+        ),
         const SizedBox(height: AppTheme.space8),
         InkWell(
           onTap: () => _showPickerOptions(context),
+          borderRadius: BorderRadius.circular(AppTheme.radiusCard),
           child: Container(
-            height: 100,
-            width: 100,
+            height: 96,
+            width: 96,
             decoration: BoxDecoration(
               border: Border.all(
-                color: AppColors.outline,
+                color: AppColors.outlineVariant,
                 style: BorderStyle.solid,
-                width: 1,
+                width: 1.5,
               ),
               borderRadius: BorderRadius.circular(AppTheme.radiusCard),
+              color: AppColors.surfaceContainerLowest,
             ),
             child: currentPath != null && File(currentPath!).existsSync()
                 ? ClipRRect(
@@ -102,12 +107,23 @@ class ImagePickerWidget extends StatelessWidget {
                       fit: BoxFit.cover,
                     ),
                   )
-                : Center(
-                    child: Icon(
-                      Icons.add_a_photo_outlined,
-                      size: 40,
-                      color: AppColors.outline,
-                    ),
+                : Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.add_a_photo_outlined,
+                        size: 28,
+                        color: AppColors.outlineVariant,
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Upload',
+                        style: AppTextStyles.caption.copyWith(
+                          color: AppColors.outline,
+                          fontSize: 10,
+                        ),
+                      ),
+                    ],
                   ),
           ),
         ),
