@@ -7,6 +7,7 @@ import 'package:little_invoice/core/utils/currency_formatter.dart';
 import 'package:little_invoice/models/invoice.dart';
 import 'package:little_invoice/providers/invoice_provider.dart';
 import 'package:little_invoice/screens/invoice_list_screen.dart';
+import 'package:little_invoice/screens/invoice_detail_screen.dart';
 import 'package:little_invoice/screens/invoice_form_screen.dart';
 import 'package:little_invoice/screens/buyer_list_screen.dart';
 import 'package:little_invoice/screens/seller_profile_screen.dart';
@@ -16,12 +17,20 @@ import 'package:little_invoice/widgets/empty_state_widget.dart';
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
+  static void setTabIndex(BuildContext context, int index) {
+    context.findAncestorStateOfType<_HomeScreenState>()?.setTabIndex(index);
+  }
+
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
+
+  void setTabIndex(int index) {
+    setState(() => _currentIndex = index);
+  }
 
   static const _navItems = [
     _NavItem(Icons.dashboard_outlined, Icons.dashboard, 'Dashboard'),
@@ -253,12 +262,7 @@ class _HomeTab extends StatelessWidget {
                   ),
                   TextButton(
                     onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const InvoiceListScreen(),
-                        ),
-                      );
+                      HomeScreen.setTabIndex(context, 1);
                     },
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -313,11 +317,12 @@ class _HomeTab extends StatelessWidget {
                                 child: InvoiceCard(
                                   invoice: invoice,
                                   onTap: () {
+                                    HomeScreen.setTabIndex(context, 1);
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (_) => InvoiceListScreen(
-                                          initialInvoiceId: invoice.id,
+                                        builder: (_) => InvoiceDetailScreen(
+                                          invoiceId: invoice.id!,
                                         ),
                                       ),
                                     );

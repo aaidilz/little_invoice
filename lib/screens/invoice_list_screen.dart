@@ -11,12 +11,7 @@ import 'package:little_invoice/widgets/invoice_card.dart';
 import 'package:little_invoice/widgets/empty_state_widget.dart';
 
 class InvoiceListScreen extends StatefulWidget {
-  final int? initialInvoiceId;
-
-  const InvoiceListScreen({
-    super.key,
-    this.initialInvoiceId,
-  });
+  const InvoiceListScreen({super.key});
 
   @override
   State<InvoiceListScreen> createState() => _InvoiceListScreenState();
@@ -24,23 +19,6 @@ class InvoiceListScreen extends StatefulWidget {
 
 class _InvoiceListScreenState extends State<InvoiceListScreen> {
   InvoiceStatus? _filterStatus;
-
-  @override
-  void initState() {
-    super.initState();
-    if (widget.initialInvoiceId != null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => InvoiceDetailScreen(
-              invoiceId: widget.initialInvoiceId!,
-            ),
-          ),
-        );
-      });
-    }
-  }
 
   List<Invoice> _getFilteredInvoices(List<Invoice> invoices) {
     if (_filterStatus == null) {
@@ -181,17 +159,15 @@ class _FilterTab extends StatelessWidget {
                     ),
                   ]
                 : null,
-            border: isSelected
-                ? Border.all(color: AppColors.outlineVariant)
-                : null,
+            border:
+                isSelected ? Border.all(color: AppColors.outlineVariant) : null,
           ),
           child: Center(
             child: Text(
               label,
               style: AppTextStyles.labelBold.copyWith(
-                color: isSelected
-                    ? AppColors.primary
-                    : AppColors.onSurfaceVariant,
+                color:
+                    isSelected ? AppColors.primary : AppColors.onSurfaceVariant,
               ),
             ),
           ),

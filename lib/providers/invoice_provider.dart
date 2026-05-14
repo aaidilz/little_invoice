@@ -56,6 +56,9 @@ class InvoiceProvider extends ChangeNotifier {
             1;
         final createdInvoice = invoice.copyWith(id: nextId);
         _invoices.insert(0, createdInvoice);
+        _currentItems.addAll(items
+            .map((item) => item.copyWith(invoiceId: nextId, id: null))
+            .toList());
       } else {
         final db = await DatabaseHelper.instance.database;
         final id = await db.transaction((txn) async {
@@ -110,6 +113,11 @@ class InvoiceProvider extends ChangeNotifier {
             await txn.insert('invoice_items', itemWithInvoiceId.toMap());
           }
         });
+      } else {
+        _currentItems.removeWhere((item) => item.invoiceId == invoice.id);
+        _currentItems.addAll(items
+            .map((item) => item.copyWith(invoiceId: invoice.id!, id: null))
+            .toList());
       }
 
       final index = _invoices.indexWhere((inv) => inv.id == invoice.id);
@@ -189,6 +197,8 @@ class InvoiceProvider extends ChangeNotifier {
     try {
       if (!kIsWeb) {
         await _invoiceDao.delete(id);
+      } else {
+        _currentItems.removeWhere((item) => item.invoiceId == id);
       }
       _invoices.removeWhere((inv) => inv.id == id);
       await _notificationService.cancelReminder(id);
