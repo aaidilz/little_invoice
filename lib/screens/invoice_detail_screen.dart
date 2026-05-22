@@ -137,7 +137,18 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
       builder: (context, provider, child) {
         final invoice = provider.invoices.firstWhere(
           (i) => i.id == widget.invoiceId,
+          orElse: () => Invoice.empty(),
         );
+
+        if (invoice.id == null) {
+          return Scaffold(
+            appBar: AppBar(title: const Text('Invoice')),
+            body: const Center(
+              child: Text('Invoice not found or has been deleted.'),
+            ),
+          );
+        }
+
         final items = provider.currentItems;
         final seller = context.watch<SellerProvider>().profile;
         final buyers = context.watch<BuyerProvider>().buyers;

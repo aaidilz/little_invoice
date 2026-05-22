@@ -51,7 +51,8 @@ class _SellerProfileScreenState extends State<SellerProfileScreen> {
 
   void _save() {
     if (_formKey.currentState!.validate()) {
-      final profile = context.read<SellerProvider>().profile;
+      final provider = context.read<SellerProvider>();
+      final profile = provider.profile;
       final newProfile = SellerProfile(
         id: profile?.id,
         name: _nameController.text,
@@ -63,8 +64,13 @@ class _SellerProfileScreenState extends State<SellerProfileScreen> {
         stampPath: _stampPath,
         signaturePath: _signaturePath,
       );
-      context.read<SellerProvider>().saveProfile(newProfile).then((_) {
-        if (mounted) {
+      provider.saveProfile(newProfile).then((_) {
+        if (!mounted) return;
+        if (provider.errorMessage != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error: ${provider.errorMessage}')),
+          );
+        } else {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Profile saved successfully')),
           );

@@ -3,12 +3,84 @@ import 'package:provider/provider.dart';
 import 'package:little_invoice/core/theme/app_colors.dart';
 import 'package:little_invoice/core/theme/app_text_styles.dart';
 import 'package:little_invoice/core/theme/app_theme.dart';
+import 'package:little_invoice/models/buyer.dart';
 import 'package:little_invoice/providers/buyer_provider.dart';
+import 'package:little_invoice/providers/invoice_provider.dart';
 import 'package:little_invoice/screens/buyer_form_screen.dart';
 import 'package:little_invoice/widgets/empty_state_widget.dart';
 
-class BuyerListScreen extends StatelessWidget {
+class BuyerListScreen extends StatefulWidget {
   const BuyerListScreen({super.key});
+
+  @override
+  State<BuyerListScreen> createState() => _BuyerListScreenState();
+}
+
+class _BuyerListScreenState extends State<BuyerListScreen> {
+  String _searchQuery = '';
+
+  /// Filter buyers by search query (name or email, case-insensitive).
+  List<Buyer> _filterBuyers(List<Buyer> buyers) {
+    if (_searchQuery.isEmpty) return buyers;
+    final q = _searchQuery.toLowerCase();
+    return buyers.where((b) {
+      return b.name.toLowerCase().contains(q) ||
+          b.email.toLowerCase().contains(q);
+    }).toList();
+  }
+
+  /// Check if any invoice references this buyer before deleting.
+  Future<bool> _confirmDelete(BuildContext context, Buyer buyer) async {
+    final invoiceProvider = context.read<InvoiceProvider>();
+    final hasInvoices =
+        invoiceProvider.invoices.any((i) => i.buyerId == buyer.id);
+
+    if (hasInvoices) {
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('Cannot Delete Client'),
+          content: Text(
+            '${buyer.name} has existing invoices. '
+            'Delete all related invoices first, or force delete?',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              style: TextButton.styleFrom(foregroundColor: AppColors.error),
+              child: const Text('Force Delete'),
+            ),
+          ],
+        ),
+      );
+      return confirmed == true;
+    }
+
+    // No invoices — still ask for confirmation
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Delete Client'),
+        content: Text('Are you sure you want to delete ${buyer.name}?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: TextButton.styleFrom(foregroundColor: AppColors.error),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+    return confirmed == true;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,12 +90,26 @@ class BuyerListScreen extends StatelessWidget {
           return const Center(child: CircularProgressIndicator());
         }
 
+        // Show provider errors
+        if (provider.errorMessage != null) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Error: ${provider.errorMessage}')),
+              );
+            }
+          });
+        }
+
+        final filteredBuyers = _filterBuyers(provider.buyers);
+
         return Column(
           children: [
             // ── Search bar (matching DESIGN) ──
             Padding(
               padding: const EdgeInsets.all(AppTheme.space16),
               child: TextField(
+                onChanged: (value) => setState(() => _searchQuery = value),
                 decoration: InputDecoration(
                   hintText: 'Search clients by name or email...',
                   hintStyle: AppTextStyles.bodyLg.copyWith(
@@ -33,6 +119,13 @@ class BuyerListScreen extends StatelessWidget {
                     Icons.search,
                     color: AppColors.outline,
                   ),
+                  suffixIcon: _searchQuery.isNotEmpty
+                      ? IconButton(
+                          icon: const Icon(Icons.clear, size: 20),
+                          onPressed: () =>
+                              setState(() => _searchQuery = ''),
+                        )
+                      : null,
                   filled: true,
                   fillColor: AppColors.surfaceContainerLowest,
                   contentPadding: const EdgeInsets.symmetric(
@@ -40,19 +133,22 @@ class BuyerListScreen extends StatelessWidget {
                     vertical: AppTheme.space16,
                   ),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(AppTheme.radiusCard),
+                    borderRadius:
+                        BorderRadius.circular(AppTheme.radiusCard),
                     borderSide: const BorderSide(
                       color: AppColors.outlineVariant,
                     ),
                   ),
                   enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(AppTheme.radiusCard),
+                    borderRadius:
+                        BorderRadius.circular(AppTheme.radiusCard),
                     borderSide: const BorderSide(
                       color: AppColors.outlineVariant,
                     ),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(AppTheme.radiusCard),
+                    borderRadius:
+                        BorderRadius.circular(AppTheme.radiusCard),
                     borderSide: const BorderSide(
                       color: AppColors.primaryContainer,
                       width: 1.5,
@@ -78,7 +174,9 @@ class BuyerListScreen extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      '${provider.buyers.length} total',
+                      _searchQuery.isEmpty
+                          ? '${provider.buyers.length} total'
+                          : '${filteredBuyers.length} of ${provider.buyers.length}',
                       style: AppTextStyles.labelBold.copyWith(
                         color: AppColors.onSurfaceVariant,
                       ),
@@ -90,37 +188,51 @@ class BuyerListScreen extends StatelessWidget {
 
             // ── List ──
             Expanded(
-              child: provider.buyers.isEmpty
+              child: filteredBuyers.isEmpty
                   ? EmptyStateWidget(
-                      icon: Icons.group_off_outlined,
-                      headline: 'No clients found',
-                      body:
-                          'Start adding your business contacts to manage your invoices more efficiently.',
-                      ctaLabel: 'Add Client',
-                      onCta: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const BuyerFormScreen(),
-                          ),
-                        );
-                      },
+                      icon: _searchQuery.isNotEmpty
+                          ? Icons.search_off_outlined
+                          : Icons.group_off_outlined,
+                      headline: _searchQuery.isNotEmpty
+                          ? 'No results'
+                          : 'No clients found',
+                      body: _searchQuery.isNotEmpty
+                          ? 'No clients match "$_searchQuery".'
+                          : 'Start adding your business contacts to manage your invoices more efficiently.',
+                      ctaLabel:
+                          _searchQuery.isNotEmpty ? null : 'Add Client',
+                      onCta: _searchQuery.isNotEmpty
+                          ? null
+                          : () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) =>
+                                      const BuyerFormScreen(),
+                                ),
+                              );
+                            },
                     )
                   : ListView.separated(
                       padding: const EdgeInsets.symmetric(
                         horizontal: AppTheme.space16,
                         vertical: AppTheme.space8,
                       ),
-                      itemCount: provider.buyers.length,
+                      itemCount: filteredBuyers.length,
                       separatorBuilder: (_, __) =>
                           const SizedBox(height: AppTheme.space12),
                       itemBuilder: (ctx, idx) {
-                        final buyer = provider.buyers[idx];
+                        final buyer = filteredBuyers[idx];
                         final initials = _getInitials(buyer.name);
 
                         return Dismissible(
                           key: Key(buyer.id.toString()),
                           direction: DismissDirection.endToStart,
+                          confirmDismiss: (_) =>
+                              _confirmDelete(context, buyer),
+                          onDismissed: (_) {
+                            provider.deleteBuyer(buyer.id!);
+                          },
                           background: Container(
                             alignment: Alignment.centerRight,
                             padding: const EdgeInsets.only(
@@ -138,9 +250,6 @@ class BuyerListScreen extends StatelessWidget {
                               size: 28,
                             ),
                           ),
-                          onDismissed: (_) {
-                            provider.deleteBuyer(buyer.id!);
-                          },
                           child: _BuyerCard(
                             initials: initials,
                             name: buyer.name,

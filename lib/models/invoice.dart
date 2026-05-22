@@ -31,6 +31,22 @@ class Invoice {
     this.notes,
   });
 
+  /// Creates a sentinel invoice with null [id], used as a safe fallback
+  /// for `firstWhere(..., orElse: () => Invoice.empty())`.
+  factory Invoice.empty() => Invoice(
+        sellerId: 0,
+        buyerId: 0,
+        invoiceNumber: '',
+        cityDate: '',
+        dueDate: DateTime(1970),
+        status: InvoiceStatus.unpaid,
+        subtotal: 0,
+        discount: 0,
+        tax: 0,
+        dp: 0,
+        total: 0,
+      );
+
   factory Invoice.fromMap(Map<String, dynamic> map) {
     return Invoice(
       id: map['id'] as int?,

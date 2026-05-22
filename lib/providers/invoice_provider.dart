@@ -211,22 +211,21 @@ class InvoiceProvider extends ChangeNotifier {
   }
 
   Future<List<InvoiceItem>> getItemsForInvoice(int invoiceId) async {
-    _isLoading = true;
-    notifyListeners();
     try {
       if (kIsWeb) {
-        return _currentItems
+        _currentItems = _currentItems
             .where((item) => item.invoiceId == invoiceId)
             .toList();
+        notifyListeners();
+        return _currentItems;
       }
       _currentItems = await _itemDao.getByInvoice(invoiceId);
+      notifyListeners();
       return _currentItems;
     } catch (e) {
       _errorMessage = e.toString();
-      return [];
-    } finally {
-      _isLoading = false;
       notifyListeners();
+      return [];
     }
   }
 }

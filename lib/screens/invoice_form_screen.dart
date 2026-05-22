@@ -31,6 +31,9 @@ class _InvoiceFormScreenState extends State<InvoiceFormScreen> {
   final _formKey = GlobalKey<FormState>();
   final _calculator = InvoiceCalculator();
 
+  /// Cached copy of the original invoice when editing (avoids repeated firstWhere).
+  Invoice? _originalInvoice;
+
   Buyer? _selectedBuyer;
   late TextEditingController _cityDateController;
   late TextEditingController _notesController;
@@ -60,19 +63,35 @@ class _InvoiceFormScreenState extends State<InvoiceFormScreen> {
 
     if (widget.invoiceId != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
+        // Store references before async gap to avoid context misuse.
         final provider = context.read<InvoiceProvider>();
+        final buyerProvider = context.read<BuyerProvider>();
+
         final invoice = provider.invoices.firstWhere(
           (i) => i.id == widget.invoiceId,
+          orElse: () => Invoice.empty(),
         );
+        if (invoice.id == null) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Invoice not found')),
+            );
+            Navigator.pop(context);
+          }
+          return;
+        }
+
         final items = await provider.getItemsForInvoice(widget.invoiceId!);
         if (!mounted) return;
-        final buyers = context.read<BuyerProvider>().buyers;
+
+        final buyers = buyerProvider.buyers;
         final buyer = buyers.firstWhere(
           (b) => b.id == invoice.buyerId,
           orElse: () => Buyer(id: invoice.buyerId, name: 'Unknown Client', address: '-', phone: '-', email: '-'),
         );
 
         setState(() {
+          _originalInvoice = invoice;
           _selectedBuyer = buyer;
           _cityDateController.text = invoice.cityDate;
           _dueDate = invoice.dueDate;
@@ -143,22 +162,10 @@ class _InvoiceFormScreenState extends State<InvoiceFormScreen> {
         id: widget.invoiceId,
         sellerId: seller.id!,
         buyerId: _selectedBuyer!.id!,
-        invoiceNumber: widget.invoiceId != null
-            ? context
-                    .read<InvoiceProvider>()
-                    .invoices
-                    .firstWhere((i) => i.id == widget.invoiceId)
-                    .invoiceNumber
-            : generateInvoiceNumber(),
+        invoiceNumber: _originalInvoice?.invoiceNumber ?? generateInvoiceNumber(),
         cityDate: _cityDateController.text,
         dueDate: _dueDate,
-        status: widget.invoiceId != null
-            ? context
-                    .read<InvoiceProvider>()
-                    .invoices
-                    .firstWhere((i) => i.id == widget.invoiceId)
-                    .status
-            : InvoiceStatus.unpaid,
+        status: _originalInvoice?.status ?? InvoiceStatus.unpaid,
         subtotal: _calcResult['subtotal']!,
         discount: discount,
         tax: tax,
@@ -170,11 +177,25 @@ class _InvoiceFormScreenState extends State<InvoiceFormScreen> {
       final provider = context.read<InvoiceProvider>();
       if (widget.invoiceId == null) {
         provider.createInvoice(invoice, _items).then((_) {
-          if (mounted) Navigator.pop(context);
+          if (!mounted) return;
+          if (provider.errorMessage != null) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Error: ${provider.errorMessage}')),
+            );
+          } else {
+            Navigator.pop(context);
+          }
         });
       } else {
         provider.updateInvoice(invoice, _items).then((_) {
-          if (mounted) Navigator.pop(context);
+          if (!mounted) return;
+          if (provider.errorMessage != null) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Error: ${provider.errorMessage}')),
+            );
+          } else {
+            Navigator.pop(context);
+          }
         });
       }
     }
