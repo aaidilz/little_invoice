@@ -22,9 +22,9 @@ class PdfGenerator {
     required List<InvoiceItem> items,
     int templateIndex = 0,
   }) async {
-    final fontData = await rootBundle.load('/fonts/Poppins-Regular.ttf');
+    final fontData = await rootBundle.load('assets/fonts/Poppins-Regular.ttf');
     final ttf = pw.Font.ttf(fontData);
-    final fontBoldData = await rootBundle.load('/fonts/Poppins-Bold.ttf');
+    final fontBoldData = await rootBundle.load('assets/fonts/Poppins-Bold.ttf');
     final ttfBold = pw.Font.ttf(fontBoldData);
     final theme = pw.ThemeData.withFont(base: ttf, bold: ttfBold);
 
