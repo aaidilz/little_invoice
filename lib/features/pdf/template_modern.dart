@@ -5,10 +5,12 @@ import 'package:little_invoice/models/invoice.dart';
 import 'package:little_invoice/models/invoice_item.dart';
 import 'package:little_invoice/models/seller_profile.dart';
 import 'package:intl/intl.dart';
+import 'package:little_invoice/core/utils/currency_formatter.dart';
 
 class TemplateModern {
   static void buildPdf({
     required pw.Document pdf,
+    required pw.ThemeData theme,
     required Invoice invoice,
     required SellerProfile seller,
     required Buyer buyer,
@@ -23,6 +25,7 @@ class TemplateModern {
 
     pdf.addPage(
       pw.MultiPage(
+        theme: theme,
         pageFormat: PdfPageFormat.a4.copyWith(
           marginTop: 0,
           marginBottom: 36,
@@ -148,8 +151,8 @@ class TemplateModern {
         idx.toString(),
         item.description,
         item.quantity.toString(),
-        item.price.toStringAsFixed(2),
-        item.lineTotal.toStringAsFixed(2),
+        CurrencyFormatter.format(item.price),
+        CurrencyFormatter.format(item.lineTotal),
       ];
     }).toList();
 
@@ -175,25 +178,35 @@ class TemplateModern {
   }
 
   static pw.Widget _buildCalculationSummary(Invoice invoice) {
+    final discountVal = invoice.subtotal * invoice.discount / 100;
+    final taxVal = (invoice.subtotal - discountVal) * invoice.tax / 100;
+
     return pw.Row(
       mainAxisAlignment: pw.MainAxisAlignment.end,
       children: [
         pw.Container(
-          width: 200,
-          child: pw.Column(
-            crossAxisAlignment: pw.CrossAxisAlignment.stretch,
+          width: 250,
+          child: pw.Table(
+            columnWidths: {
+              0: const pw.FlexColumnWidth(2),
+              1: const pw.FlexColumnWidth(1.5),
+            },
             children: [
-              _buildSummaryRow('Subtotal', invoice.subtotal.toStringAsFixed(2)),
-              _buildSummaryRow(
-                  'Discount (${invoice.discount.toStringAsFixed(1)}%)',
-                  '– ${(invoice.subtotal * invoice.discount / 100).toStringAsFixed(2)}'),
-              _buildSummaryRow('Tax (${invoice.tax.toStringAsFixed(1)}%)',
-                  '+ ${((invoice.subtotal - (invoice.subtotal * invoice.discount / 100)) * invoice.tax / 100).toStringAsFixed(2)}'),
-              _buildSummaryRow(
-                  'Down Payment', '– ${invoice.dp.toStringAsFixed(2)}'),
-              pw.Divider(),
-              _buildSummaryRow('Total', invoice.total.toStringAsFixed(2),
-                  isBold: true),
+              _buildSummaryRow('Subtotal', CurrencyFormatter.format(invoice.subtotal)),
+              if (invoice.discount > 0)
+                _buildSummaryRow(
+                    'Discount (${invoice.discount}%)', '– ${CurrencyFormatter.format(discountVal)}'),
+              if (invoice.tax > 0)
+                _buildSummaryRow('Tax (${invoice.tax}%)', '+ ${CurrencyFormatter.format(taxVal)}'),
+              if (invoice.dp > 0)
+                _buildSummaryRow('Down Payment', '– ${CurrencyFormatter.format(invoice.dp)}'),
+              pw.TableRow(
+                children: [
+                  pw.Divider(),
+                  pw.Divider(),
+                ],
+              ),
+              _buildSummaryRow('Total', CurrencyFormatter.format(invoice.total), isBold: true),
             ],
           ),
         ),
@@ -201,23 +214,25 @@ class TemplateModern {
     );
   }
 
-  static pw.Widget _buildSummaryRow(String label, String value,
-      {bool isBold = false}) {
-    return pw.Padding(
-      padding: const pw.EdgeInsets.symmetric(vertical: 2),
-      child: pw.Row(
-        mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-        children: [
-          pw.Text(label,
-              style: pw.TextStyle(
-                  fontSize: 10,
-                  fontWeight: isBold ? pw.FontWeight.bold : null)),
-          pw.Text(value,
-              style: pw.TextStyle(
-                  fontSize: 10,
-                  fontWeight: isBold ? pw.FontWeight.bold : null)),
-        ],
-      ),
+  static pw.TableRow _buildSummaryRow(String label, String value, {bool isBold = false}) {
+    return pw.TableRow(
+      children: [
+        pw.Padding(
+          padding: const pw.EdgeInsets.symmetric(vertical: 4),
+          child: pw.Text(
+            label,
+            style: pw.TextStyle(fontSize: 10, fontWeight: isBold ? pw.FontWeight.bold : null),
+          ),
+        ),
+        pw.Padding(
+          padding: const pw.EdgeInsets.symmetric(vertical: 4),
+          child: pw.Text(
+            value,
+            textAlign: pw.TextAlign.right,
+            style: pw.TextStyle(fontSize: 10, fontWeight: isBold ? pw.FontWeight.bold : null),
+          ),
+        ),
+      ],
     );
   }
 

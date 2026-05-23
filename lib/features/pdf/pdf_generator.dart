@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:pdf/widgets.dart' as pw;
 import 'package:little_invoice/core/services/file_service.dart';
 import 'package:little_invoice/models/buyer.dart';
@@ -21,7 +22,13 @@ class PdfGenerator {
     required List<InvoiceItem> items,
     int templateIndex = 0,
   }) async {
-    final pdf = pw.Document();
+    final fontData = await rootBundle.load('/fonts/Poppins-Regular.ttf');
+    final ttf = pw.Font.ttf(fontData);
+    final fontBoldData = await rootBundle.load('/fonts/Poppins-Bold.ttf');
+    final ttfBold = pw.Font.ttf(fontBoldData);
+    final theme = pw.ThemeData.withFont(base: ttf, bold: ttfBold);
+
+    final pdf = pw.Document(theme: theme);
 
     pw.MemoryImage? logoImage;
     if (seller.logoPath != null && await File(seller.logoPath!).exists()) {
@@ -43,6 +50,7 @@ class PdfGenerator {
     if (templateIndex == 0) {
       TemplateClassic.buildPdf(
         pdf: pdf,
+        theme: theme,
         invoice: invoice,
         seller: seller,
         buyer: buyer,
@@ -54,6 +62,7 @@ class PdfGenerator {
     } else {
       TemplateModern.buildPdf(
         pdf: pdf,
+        theme: theme,
         invoice: invoice,
         seller: seller,
         buyer: buyer,
