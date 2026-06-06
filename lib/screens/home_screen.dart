@@ -54,7 +54,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 shape: BoxShape.rectangle,
               ),
               child: Image.asset(
-                'images/Icon.png',
+                'assets/images/Icon.png',
                 width: 20,
                 height: 20,
                 fit: BoxFit.contain,
@@ -69,7 +69,9 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         actions: [
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              setState(() => _currentIndex = 3);
+            },
             icon: const Icon(Icons.account_circle_outlined),
             color: AppColors.onSurfaceVariant,
           ),

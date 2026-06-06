@@ -25,18 +25,37 @@ class _SellerProfileScreenState extends State<SellerProfileScreen> {
   String? _stampPath;
   String? _signaturePath;
 
+  bool _initialized = false;
+
   @override
   void initState() {
     super.initState();
+    _nameController = TextEditingController();
+    _addressController = TextEditingController();
+    _phoneController = TextEditingController();
+    _emailController = TextEditingController();
+    _bankController = TextEditingController();
+  }
+
+  /// Called every time a dependency (i.e. a Provider) changes.
+  /// We use this instead of initState so that we catch the case where
+  /// SellerProvider finishes loading after the widget is first built.
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_initialized) return; // only populate once
     final profile = context.read<SellerProvider>().profile;
-    _nameController = TextEditingController(text: profile?.name ?? '');
-    _addressController = TextEditingController(text: profile?.address ?? '');
-    _phoneController = TextEditingController(text: profile?.phone ?? '');
-    _emailController = TextEditingController(text: profile?.email ?? '');
-    _bankController = TextEditingController(text: profile?.bank ?? '');
-    _logoPath = profile?.logoPath;
-    _stampPath = profile?.stampPath;
-    _signaturePath = profile?.signaturePath;
+    if (profile != null) {
+      _nameController.text = profile.name;
+      _addressController.text = profile.address;
+      _phoneController.text = profile.phone;
+      _emailController.text = profile.email;
+      _bankController.text = profile.bank;
+      _logoPath = profile.logoPath;
+      _stampPath = profile.stampPath;
+      _signaturePath = profile.signaturePath;
+      _initialized = true;
+    }
   }
 
   @override
@@ -83,7 +102,25 @@ class _SellerProfileScreenState extends State<SellerProfileScreen> {
   Widget build(BuildContext context) {
     return Consumer<SellerProvider>(
       builder: (context, provider, child) {
-        if (provider.isLoading) {
+        // If the profile just became available, populate controllers now.
+        if (!_initialized && provider.profile != null) {
+          final profile = provider.profile!;
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (!mounted) return;
+            setState(() {
+              _nameController.text = profile.name;
+              _addressController.text = profile.address;
+              _phoneController.text = profile.phone;
+              _emailController.text = profile.email;
+              _bankController.text = profile.bank;
+              _logoPath = profile.logoPath;
+              _stampPath = profile.stampPath;
+              _signaturePath = profile.signaturePath;
+              _initialized = true;
+            });
+          });
+        }
+        if (provider.isLoading && !_initialized) {
           return const Center(child: CircularProgressIndicator());
         }
         return Form(
