@@ -11,6 +11,7 @@ import 'package:little_invoice/screens/invoice_detail_screen.dart';
 import 'package:little_invoice/screens/invoice_form_screen.dart';
 import 'package:little_invoice/screens/buyer_list_screen.dart';
 import 'package:little_invoice/screens/settings_screen.dart';
+import 'package:little_invoice/screens/seller_profile_screen.dart';
 import 'package:little_invoice/widgets/invoice_card.dart';
 import 'package:little_invoice/widgets/empty_state_widget.dart';
 
@@ -36,7 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _NavItem(Icons.dashboard_outlined, Icons.dashboard, 'Dashboard'),
     _NavItem(Icons.receipt_long_outlined, Icons.receipt_long, 'Invoices'),
     _NavItem(Icons.people_outline, Icons.people, 'Clients'),
-    _NavItem(Icons.settings_outlined, Icons.settings, 'Settings'),
+    _NavItem(Icons.person_outline, Icons.person, 'Profile'),
   ];
 
   @override
@@ -70,7 +71,10 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: [
           IconButton(
             onPressed: () {
-              setState(() => _currentIndex = 3);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const SettingsScreen()),
+              );
             },
             icon: const Icon(Icons.settings_outlined),
             color: AppColors.onSurfaceVariant,
@@ -84,7 +88,7 @@ class _HomeScreenState extends State<HomeScreen> {
           _HomeTab(),
           InvoiceListScreen(),
           BuyerListScreen(),
-          SettingsScreen(),
+          SellerProfileScreen(),
         ],
       ),
 
