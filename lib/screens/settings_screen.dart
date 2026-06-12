@@ -137,7 +137,7 @@ class SettingsScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          'App Version 1.0.7',
+                          'App Version 1.0.8',
                           style: AppTextStyles.bodyMd.copyWith(
                             color: AppColors.onSurfaceVariant,
                           ),
@@ -155,7 +155,7 @@ class SettingsScreen extends StatelessWidget {
                         borderRadius: BorderRadius.circular(AppTheme.radiusBadge),
                       ),
                       child: Text(
-                        'v1.0.5',
+                        'v1.0.8',
                         style: AppTextStyles.labelBold.copyWith(
                           color: AppColors.onPrimaryContainer,
                         ),

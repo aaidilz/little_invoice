@@ -48,4 +48,23 @@ class Buyer {
       email: email ?? this.email,
     );
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! Buyer) return false;
+    if (id != null && other.id != null) {
+      return id == other.id;
+    }
+    return name == other.name &&
+        address == other.address &&
+        phone == other.phone &&
+        email == other.email;
+  }
+
+  @override
+  int get hashCode {
+    if (id != null) return id.hashCode;
+    return Object.hash(name, address, phone, email);
+  }
 }

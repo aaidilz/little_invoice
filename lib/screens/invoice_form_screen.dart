@@ -7,6 +7,7 @@ import 'package:little_invoice/models/buyer.dart';
 import 'package:little_invoice/models/invoice.dart';
 import 'package:little_invoice/models/invoice_item.dart';
 import 'package:little_invoice/providers/buyer_provider.dart';
+import 'package:little_invoice/screens/buyer_form_screen.dart';
 import 'package:little_invoice/providers/invoice_provider.dart';
 import 'package:little_invoice/providers/seller_provider.dart';
 import 'package:little_invoice/widgets/calculation_summary_widget.dart';
@@ -243,19 +244,58 @@ class _InvoiceFormScreenState extends State<InvoiceFormScreen> {
                   // Buyer selector
                   const _FieldLabel('SELECT BUYER'),
                   const SizedBox(height: AppTheme.space4),
-                  DropdownButtonFormField<Buyer>(
-                    initialValue: _selectedBuyer,
-                    decoration: const InputDecoration(
-                      hintText: 'Search or select a client',
-                    ),
-                    items: buyers
-                        .map((b) => DropdownMenuItem(
-                              value: b,
-                              child: Text(b.name),
-                            ))
-                        .toList(),
-                    onChanged: (b) => setState(() => _selectedBuyer = b),
-                    validator: (v) => v == null ? 'Required' : null,
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: DropdownButtonFormField<Buyer>(
+                          key: ValueKey(_selectedBuyer),
+                          initialValue: _selectedBuyer,
+                          decoration: const InputDecoration(
+                            hintText: 'Search or select a client',
+                          ),
+                          items: () {
+                            final list = buyers
+                                .map((b) => DropdownMenuItem(
+                                      value: b,
+                                      child: Text(b.name),
+                                    ))
+                                .toList();
+                            if (_selectedBuyer != null &&
+                                !buyers.any((b) => b.id == _selectedBuyer!.id)) {
+                              list.add(DropdownMenuItem(
+                                value: _selectedBuyer,
+                                child: Text(_selectedBuyer!.name),
+                              ));
+                            }
+                            return list;
+                          }(),
+                          onChanged: (b) => setState(() => _selectedBuyer = b),
+                          validator: (v) => v == null ? 'Required' : null,
+                        ),
+                      ),
+                      const SizedBox(width: AppTheme.space8),
+                      SizedBox(
+                        height: 56,
+                        child: IconButton.filledTonal(
+                          onPressed: () async {
+                            final newBuyer = await Navigator.push<Buyer?>(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const BuyerFormScreen(),
+                              ),
+                            );
+                            if (newBuyer != null) {
+                              setState(() {
+                                _selectedBuyer = newBuyer;
+                              });
+                            }
+                          },
+                          icon: const Icon(Icons.person_add_outlined),
+                          tooltip: 'Add Client',
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: AppTheme.space16),
 

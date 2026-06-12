@@ -10,6 +10,7 @@ import 'package:little_invoice/screens/invoice_list_screen.dart';
 import 'package:little_invoice/screens/invoice_detail_screen.dart';
 import 'package:little_invoice/screens/invoice_form_screen.dart';
 import 'package:little_invoice/screens/buyer_list_screen.dart';
+import 'package:little_invoice/screens/buyer_form_screen.dart';
 import 'package:little_invoice/screens/settings_screen.dart';
 import 'package:little_invoice/screens/seller_profile_screen.dart';
 import 'package:little_invoice/widgets/invoice_card.dart';
@@ -119,14 +120,22 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
 
       // ── FAB ──
-      floatingActionButton: _currentIndex == 0 || _currentIndex == 1
+      floatingActionButton: _currentIndex == 0 || _currentIndex == 1 || _currentIndex == 2
           ? FloatingActionButton(
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const InvoiceFormScreen()),
-                );
+                if (_currentIndex == 2) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const BuyerFormScreen()),
+                  );
+                } else {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const InvoiceFormScreen()),
+                  );
+                }
               },
+              tooltip: _currentIndex == 2 ? 'Add Client' : 'Create Invoice',
               child: const Icon(Icons.add, size: 28),
             )
           : null,

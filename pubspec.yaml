@@ -2,7 +2,7 @@ name: little_invoice
 description: Offline mobile invoice application
 
 publish_to: "none"
-version: 1.0.7+7
+version: 1.0.8+8
 
 environment:
   sdk: ">=3.3.0 <4.0.0"

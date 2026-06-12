@@ -48,18 +48,18 @@ class _BuyerFormScreenState extends State<BuyerFormScreen> {
     if (_formKey.currentState!.validate()) {
       final buyer = Buyer(
         id: widget.buyer?.id,
-        name: _nameController.text,
-        address: _addressController.text,
-        phone: _phoneController.text,
-        email: _emailController.text,
+        name: _nameController.text.trim(),
+        address: _addressController.text.trim(),
+        phone: _phoneController.text.trim(),
+        email: _emailController.text.trim(),
       );
       if (widget.buyer == null) {
-        context.read<BuyerProvider>().addBuyer(buyer).then((_) {
-          if (mounted) Navigator.pop(context);
+        context.read<BuyerProvider>().addBuyer(buyer).then((savedBuyer) {
+          if (mounted) Navigator.pop(context, savedBuyer);
         });
       } else {
         context.read<BuyerProvider>().updateBuyer(buyer).then((_) {
-          if (mounted) Navigator.pop(context);
+          if (mounted) Navigator.pop(context, buyer);
         });
       }
     }
@@ -114,7 +114,7 @@ class _BuyerFormScreenState extends State<BuyerFormScreen> {
                       hintText: 'Enter full name',
                     ),
                     validator: (v) =>
-                        v == null || v.isEmpty ? 'Required' : null,
+                        v == null || v.trim().isEmpty ? 'Required' : null,
                   ),
                   const SizedBox(height: AppTheme.space16),
 
@@ -129,11 +129,9 @@ class _BuyerFormScreenState extends State<BuyerFormScreen> {
                   TextFormField(
                     controller: _addressController,
                     decoration: const InputDecoration(
-                      hintText: 'Enter address',
+                      hintText: 'Enter address (optional)',
                     ),
                     maxLines: 2,
-                    validator: (v) =>
-                        v == null || v.isEmpty ? 'Required' : null,
                   ),
                   const SizedBox(height: AppTheme.space16),
 
@@ -148,11 +146,9 @@ class _BuyerFormScreenState extends State<BuyerFormScreen> {
                   TextFormField(
                     controller: _phoneController,
                     decoration: const InputDecoration(
-                      hintText: 'Enter phone number',
+                      hintText: 'Enter phone number (optional)',
                     ),
                     keyboardType: TextInputType.phone,
-                    validator: (v) =>
-                        v == null || v.isEmpty ? 'Required' : null,
                   ),
                   const SizedBox(height: AppTheme.space16),
 
@@ -167,11 +163,17 @@ class _BuyerFormScreenState extends State<BuyerFormScreen> {
                   TextFormField(
                     controller: _emailController,
                     decoration: const InputDecoration(
-                      hintText: 'Enter email address',
+                      hintText: 'Enter email address (optional)',
                     ),
                     keyboardType: TextInputType.emailAddress,
-                    validator: (v) =>
-                        v == null || v.isEmpty ? 'Required' : null,
+                    validator: (v) {
+                      if (v == null || v.trim().isEmpty) return null;
+                      final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+$');
+                      if (!emailRegex.hasMatch(v.trim())) {
+                        return 'Enter a valid email address';
+                      }
+                      return null;
+                    },
                   ),
                 ],
               ),

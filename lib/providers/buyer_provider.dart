@@ -31,26 +31,38 @@ class BuyerProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> addBuyer(Buyer buyer) async {
+  Future<Buyer?> addBuyer(Buyer buyer) async {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
+      Buyer savedBuyer;
       if (kIsWeb) {
         final nextId = (_buyers
                 .map((b) => b.id ?? 0)
                 .fold<int>(0, (maxId, id) => id > maxId ? id : maxId)) +
             1;
-        _buyers.add(buyer.copyWith(id: nextId));
+        savedBuyer = buyer.copyWith(id: nextId);
+        _buyers.add(savedBuyer);
       } else {
         final id = await _dao.insert(buyer);
-        _buyers.add(buyer.copyWith(id: id));
+        savedBuyer = buyer.copyWith(id: id);
+        _buyers.add(savedBuyer);
       }
+      return savedBuyer;
     } catch (e) {
       _errorMessage = e.toString();
+      return null;
     } finally {
       _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  void clearError() {
+    if (_errorMessage != null) {
+      _errorMessage = null;
       notifyListeners();
     }
   }

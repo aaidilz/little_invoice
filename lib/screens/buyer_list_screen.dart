@@ -97,6 +97,7 @@ class _BuyerListScreenState extends State<BuyerListScreen> {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text('Error: ${provider.errorMessage}')),
               );
+              provider.clearError();
             }
           });
         }
